@@ -55,9 +55,12 @@ class ClassLoader
     public static function init(): void
     {
         foreach (self::$proxyClasses as $proxyClass => $class) {
-            $instance = new $proxyClass();
-            Container::set($class[1], $instance);
-            Container::set($proxyClass, $instance);
+            if(Container::instance() instanceof \Webman\Container) {
+                $instance = new $proxyClass();
+                Container::set($class[1], $instance);
+            } else if (Container::instance() instanceof \DI\Container) {
+                Container::set($class[1], \DI\autowire($proxyClass));
+            }
         }
     }
 

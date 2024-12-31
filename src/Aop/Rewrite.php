@@ -66,7 +66,7 @@ class Rewrite
 
     private function init()
     {
-        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $this->parser = (new ParserFactory())->createForHostVersion();
         $this->traverser = new NodeTraverser();
         $this->prettyPrinter = new Standard();
     }
