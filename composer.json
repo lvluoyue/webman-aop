@@ -1,5 +1,5 @@
 {
-  "name": "yzh52521/webman-aop",
+  "name": "luoyue/webman-aop",
   "description": "aop aspect 切片 for the webman plugin",
   "keywords": ["aop", "aspect", "切片"],
   "type": "library",
