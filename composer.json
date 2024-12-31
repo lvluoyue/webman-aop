@@ -5,7 +5,7 @@
   "type": "library",
   "require": {
     "php": ">=7.2",
-    "nikic/php-parser": "^4.10.4"
+    "nikic/php-parser": "^5.0"
   },
   "license": "MIT",
   "autoload": {
