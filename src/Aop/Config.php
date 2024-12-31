@@ -1,6 +1,7 @@
 <?php
 namespace yzh52521\aop\Aop;
 
+use yzh52521\aop\Aop\Attributes\Parser\AspectParser;
 use yzh52521\aop\Aop\exception\ConfigException;
 use yzh52521\aop\Aop\interfaces\ProxyInterface;
 
@@ -50,6 +51,9 @@ class Config
                 }
                 $this->recursiveScan($dir, $namespace);
             }
+        }
+        if(class_exists('\LinFly\Annotation\Annotation')) {
+            $this->config['aspect'] = array_merge($this->config['aspect']??[], AspectParser::getAspects());
         }
         if (isset($this->config['aspect']) && is_array($this->config['aspect'])) {
             foreach ($this->config['aspect'] as $aspectClass) {

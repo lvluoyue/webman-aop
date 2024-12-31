@@ -4,7 +4,7 @@
   "keywords": ["aop", "aspect", "切片"],
   "type": "library",
   "require": {
-    "php": ">=7.2",
+    "php": ">=8.0",
     "nikic/php-parser": "^5.0"
   },
   "license": "MIT",
