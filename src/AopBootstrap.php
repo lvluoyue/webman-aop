@@ -35,12 +35,12 @@ class AopBootstrap implements Bootstrap
             foreach ($loaders as $loader) {
                 if (isset($loader[0]) && $loader[0] instanceof ComposerClassLoader) {
                     self::$composerClassLoader = $loader[0];
-                    self::$config = $config;
+                    self::$config = new Config($config);
                     self::$config->parse();
                     $proxyCollects = new ProxyCollects();
-                    $aspectCollects = new AspectCollects($config);
+                    $aspectCollects = new AspectCollects(self::$config);
                     $aspectCollects->collectProxy($proxyCollects);
-                    (new Rewrite($config, $proxyCollects))->rewrite();
+                    (new Rewrite(self::$config, $proxyCollects))->rewrite();
                     self::$proxyClasses = $proxyCollects->getProxyClasses();
                     self::$aspectClasses = $aspectCollects->getAspectsClass();
                     self::$classMap = $proxyCollects->getClassMap();
@@ -80,18 +80,10 @@ class AopBootstrap implements Bootstrap
             $file = self::$composerClassLoader->findFile($class);
         }
         if ($file) {
-            includeFile($file);
+            include_once $file;
             return true;
         }
         return false;
-    }
-
-}
-
-if(!function_exists('includeFile')) {
-    function includeFile($file)
-    {
-        include_once $file;
     }
 
 }
