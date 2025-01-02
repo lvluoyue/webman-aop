@@ -9,7 +9,6 @@ use yzh52521\aop\Aop\AspectCollects;
 use yzh52521\aop\Aop\Config;
 use yzh52521\aop\Aop\ProxyCollects;
 use yzh52521\aop\Aop\Rewrite;
-use function yzh52521\aop\Aop\includeFile;
 
 class AopBootstrap implements Bootstrap
 {
@@ -80,10 +79,18 @@ class AopBootstrap implements Bootstrap
             $file = self::$composerClassLoader->findFile($class);
         }
         if ($file) {
-            include_once $file;
+            include_once($file);
             return true;
         }
         return false;
+    }
+
+}
+
+if(!function_exists('includeFile')) {
+    function includeFile($file)
+    {
+        include_once $file;
     }
 
 }
