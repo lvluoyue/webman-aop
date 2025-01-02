@@ -37,9 +37,6 @@ class Rewrite
     {
         foreach ($this->proxyCollects->getClassMap() as $className => &$item) {
             foreach ($item['methods'] as $method) {
-                if ('*' === $method) {
-                    continue;
-                }
                 $this->init();
                 $code = file_get_contents($item['filePath']);
                 $ast = $this->parser->parse($code);
