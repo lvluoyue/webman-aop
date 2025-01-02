@@ -2,6 +2,7 @@
 
 namespace yzh52521\aop\Aop;
 
+use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Assign;
@@ -163,18 +164,11 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
             ])),
             // A closure that wrapped original method code.
             new Arg(new Closure([
-                'params' => value(function () use ($node) {
-                    // Transfer the variadic variable to normal variable at closure argument. ...$params => $parms
-                    $params = $node->getParams();
-                    foreach ($params as $key => $param) {
-                        if ($param instanceof Node\Param && $param->variadic) {
-                            $newParam = clone $param;
-                            $newParam->variadic = false;
-                            $params[$key] = $newParam;
-                        }
-                    }
-                    return $params;
-                }),
+                'params' => $this->filterModifier($node->getParams()),
+                'uses' => [
+                    new Variable('__function__'),
+                    new Variable('__method__'),
+                ],
                 'stmts' => $node->stmts,
             ])),
         ]);
@@ -186,6 +180,19 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
         }
         $node->stmts = $stmts;
         return $node;
+    }
+
+    /**
+     * @param Node\Param[] $params
+     * @return Node\Param[]
+     */
+    private function filterModifier(array $params): array
+    {
+        return array_map(function (Node\Param $param) {
+            $tempParam = clone $param;
+            $tempParam->flags &= ~Modifiers::VISIBILITY_MASK & ~Modifiers::READONLY;
+            return $tempParam;
+        }, $params);
     }
 
     private function unshiftMagicMethods($stmts = []): array

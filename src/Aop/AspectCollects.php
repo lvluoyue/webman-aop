@@ -2,7 +2,6 @@
 
 namespace yzh52521\aop\Aop;
 
-use Composer\Autoload\ClassLoader;
 use yzh52521\aop\Aop\exception\ParseException;
 use yzh52521\aop\AopBootstrap;
 
