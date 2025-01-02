@@ -2,6 +2,8 @@
 
 namespace yzh52521\aop\Aop;
 
+use yzh52521\aop\AopBootstrap;
+
 /**
  * Trait ProxyCallTrait.
  */
@@ -13,7 +15,7 @@ trait ProxyCallTrait
     public static function _proxyCall(string $className, string $classMethod, array $arguments, \Closure $closure)
     {
         $entryClass = new ProceedingJoinPoint($className, $classMethod, $arguments, $closure);
-        $pipeLine = new PipeLine(array_values(array_merge(ClassLoader::$classMap[$className]['methodsMap'][$classMethod] ?? [], ClassLoader::$classMap[$className]['methodsMap']['*'] ?? [])));
+        $pipeLine = new PipeLine(array_values(array_merge(AopBootstrap::$classMap[$className]['methodsMap'][$classMethod] ?? [], AopBootstrap::$classMap[$className]['methodsMap']['*'] ?? [])));
         return $pipeLine->run($entryClass, function ($entry) {
             return $entry->processOriginClosure();
         });

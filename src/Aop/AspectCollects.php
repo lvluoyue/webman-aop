@@ -4,23 +4,20 @@ namespace yzh52521\aop\Aop;
 
 use Composer\Autoload\ClassLoader;
 use yzh52521\aop\Aop\exception\ParseException;
+use yzh52521\aop\AopBootstrap;
 
 /**
  * Class ProxyClasses.
  */
 class AspectCollects
 {
-    /** @var ClassLoader */
-    private $classLoader;
-
     /** @var Config */
     private $config;
 
     private $aspectsClass = [];
 
-    public function __construct(Config $config, ClassLoader $classLoader)
+    public function __construct(Config $config)
     {
-        $this->classLoader = $classLoader;
         $this->config      = $config;
     }
 
@@ -72,7 +69,7 @@ class AspectCollects
         }
 
         foreach ($aopCollects as $className => $methods) {
-            $proxyCollects->addClassMap($className, $class, $methods, $this->classLoader->findFile($className));
+            $proxyCollects->addClassMap($className, $class, $methods, AopBootstrap::getComposerClassLoader()->findFile($className));
         }
         $proxyCollects->setMethodMaps();
         return $aopCollects;

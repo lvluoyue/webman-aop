@@ -26,30 +26,27 @@ use PhpParser\Node\Stmt\Return_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\NodeVisitorAbstract;
+use yzh52521\aop\AopBootstrap;
 
 /**
  * Class ProxyNodeVisitor.
  */
 class ProxyNodeVisitor extends NodeVisitorAbstract
 {
-    /** @var string */
-    private string $currentClass = '';
 
-    /** @var ProxyCollects */
     private ProxyCollects $proxyCollects;
 
-    private $extends = null;
+    private string $currentClass = '';
 
     private Identifier $class;
+
+    private $extends = null;
 
     public function __construct(ProxyCollects $proxyCollects)
     {
         $this->proxyCollects = $proxyCollects;
     }
 
-    /**
-     * @return mixed
-     */
     public function beforeTraverse(array $nodes)
     {
         foreach ($nodes as $namespace) {
@@ -105,13 +102,13 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
                 break;
             case $node instanceof MagicConstDir:
                 // Rewrite __DIR__ as the real directory path
-                if ($file = ClassLoader::getComposerClassLoader()->findFile($this->currentClass)) {
+                if ($file = AopBootstrap::getComposerClassLoader()->findFile($this->currentClass)) {
                     return new String_(dirname(realpath($file)));
                 }
                 break;
             case $node instanceof MagicConstFile:
                 // Rewrite __FILE__ to the real file path
-                if ($file = ClassLoader::getComposerClassLoader()->findFile($this->currentClass)) {
+                if ($file = AopBootstrap::getComposerClassLoader()->findFile($this->currentClass)) {
                     return new String_(realpath($file));
                 }
                 break;

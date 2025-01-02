@@ -7,13 +7,13 @@ use yzh52521\aop\Aop\interfaces\ProxyInterface;
 
 class Config
 {
-    private $config = [];
+    private array $config = [];
 
-    private $rebuild = false;
+    private bool $rebuild = false;
 
-    private $aspectsClasses = [];
+    private array $aspectsClasses = [];
 
-    private $path = BASE_PATH.'/runtime/Aop/aopProxyClasses';
+    private string $path = BASE_PATH.'/runtime/Aop/aopProxyClasses';
 
     public function __construct(array $config = [])
     {
