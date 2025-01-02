@@ -13,12 +13,17 @@ use PhpParser\Node\Expr\StaticPropertyFetch;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\MagicConst\Dir as MagicConstDir;
+use PhpParser\Node\Scalar\MagicConst\File as MagicConstFile;
 use PhpParser\Node\Scalar\MagicConst\Function_ as MagicConstFunction;
 use PhpParser\Node\Scalar\MagicConst\Method as MagicConstMethod;
+use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Enum_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Return_;
+use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\NodeVisitorAbstract;
 
@@ -28,14 +33,14 @@ use PhpParser\NodeVisitorAbstract;
 class ProxyNodeVisitor extends NodeVisitorAbstract
 {
     /** @var string */
-    private $currentClass = '';
+    private string $currentClass = '';
 
     /** @var ProxyCollects */
-    private $proxyCollects;
+    private ProxyCollects $proxyCollects;
 
-    private $extends;
+    private $extends = null;
 
-    private $class;
+    private Identifier $class;
 
     public function __construct(ProxyCollects $proxyCollects)
     {
@@ -51,9 +56,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
             foreach ($namespace->stmts as $class) {
                 if ($class instanceof Node\Stmt\Class_) {
                     $this->class = $class->name;
-                    if ($class->extends) {
-                        $this->extends = $class->extends;
-                    }
+                    $this->extends = $class->extends ?? null;
                     $this->currentClass = $namespace->name->toString() . '\\' . $class->name;
                     return null;
                 }
@@ -62,18 +65,19 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    /**
-     * @return null|Class_|ClassMethod|Node
-     */
     public function leaveNode(Node $node)
     {
         switch ($node) {
-            case $node instanceof Node\Stmt\ClassMethod:
-                if ($this->shouldRewrite($node)) {
-                    return $this->rewriteMethod($node);
+            case $node instanceof ClassMethod:
+                if (!$this->shouldRewrite($node)) {
+                    return $node;
                 }
-                return $this->formatMethod($node);
-            case $node instanceof Node\Stmt\Class_ && $this->shouldUseTrait():
+                return $this->rewriteMethod($node);
+            case $node instanceof Trait_:
+                // If the node is trait and php version >= 7.3, it can `use ProxyTrait` like class.
+            case $node instanceof Enum_:
+                // If the node is enum and php version >= 8.1, it can `use ProxyTrait` like class.
+            case $node instanceof Class_ && $this->shouldUseTrait():
                 // Add use proxy traits.
                 $stmts = $node->stmts;
                 if ($stmt = $this->buildProxyCallTraitUseStatement()) {
@@ -87,6 +91,30 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
                     $node->class = new Name($this->extends->toCodeString());
                     return $node;
                 }
+            case $node instanceof MagicConstFunction:
+                // Rewrite __FUNCTION__ to $__function__ variable.
+                if ($this->shouldUseTrait()) {
+                    return new Variable('__function__');
+                }
+                break;
+            case $node instanceof MagicConstMethod:
+                // Rewrite __METHOD__ to $__method__ variable.
+                if ($this->shouldUseTrait()) {
+                    return new Variable('__method__');
+                }
+                break;
+            case $node instanceof MagicConstDir:
+                // Rewrite __DIR__ as the real directory path
+                if ($file = ClassLoader::getComposerClassLoader()->findFile($this->currentClass)) {
+                    return new String_(dirname(realpath($file)));
+                }
+                break;
+            case $node instanceof MagicConstFile:
+                // Rewrite __FILE__ to the real file path
+                if ($file = ClassLoader::getComposerClassLoader()->findFile($this->currentClass)) {
+                    return new String_(realpath($file));
+                }
+                break;
         }
         return null;
     }

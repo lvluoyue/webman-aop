@@ -16,18 +16,18 @@ class ClassLoader
 
     public static $classMap = [];
     /** @var ComposerClassLoader */
-    private $composerClassLoader;
+    private static $composerClassLoader;
 
     /** @var Config */
     private $config;
 
     public function __construct(ComposerClassLoader $composerClassLoader, Config $config)
     {
-        $this->composerClassLoader = $composerClassLoader;
+        self::$composerClassLoader = $composerClassLoader;
         $this->config              = $config;
         $this->config->parse();
         $proxyCollects  = new ProxyCollects();
-        $aspectCollects = new AspectCollects($config, $this->composerClassLoader);
+        $aspectCollects = new AspectCollects($config, $composerClassLoader);
         $aspectCollects->collectProxy($proxyCollects);
         (new Rewrite($config, $proxyCollects))->rewrite();
         self::$proxyClasses  = $proxyCollects->getProxyClasses();
@@ -62,6 +62,11 @@ class ClassLoader
                 Container::set($class[1], \DI\autowire($proxyClass));
             }
         }
+    }
+
+    public static function getComposerClassLoader(): ?ComposerClassLoader
+    {
+        return static::$composerClassLoader ?? null;
     }
 
     /**
