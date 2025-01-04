@@ -5,7 +5,7 @@
  * @contact  mondagroup_php@163.com
  *
  */
-namespace yzh52521\aop\Aop;
+namespace luoyue\aop\Aop;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -15,10 +15,7 @@ use PhpParser\NodeVisitorAbstract;
  */
 class ProxyClassVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @var string
-     */
-    private $proxyClassName;
+    private string $proxyClassName;
 
     public function __construct(string $proxyClassName)
     {
@@ -31,7 +28,7 @@ class ProxyClassVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
-        // Rewirte the class name and extends the original class.
+        // Rewrite the class name and extends the original class.
         if ($node instanceof Node\Stmt\Class_ && ! $node->isAnonymous()) {
             $node->extends = new Node\Name($node->name->name);
             $node->name = new Node\Identifier($this->proxyClassName);

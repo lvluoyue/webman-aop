@@ -1,9 +1,9 @@
 <?php
 
-namespace yzh52521\aop\Aop\Attributes;
+namespace luoyue\aop\Aop\Attributes;
 
 use LinFly\Annotation\AbstractAnnotationAttribute;
-use yzh52521\aop\Aop\Attributes\Parser\AspectParser;
+use luoyue\aop\Aop\Attributes\Parser\AspectParser;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Aspect extends AbstractAnnotationAttribute

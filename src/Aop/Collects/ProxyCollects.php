@@ -1,19 +1,17 @@
 <?php
 
-namespace yzh52521\aop\Aop;
+namespace luoyue\aop\Aop\Collects;
 
 /**
  * Class ProxyCollects.
  */
 class ProxyCollects
 {
-    /** @var array */
-    private $classesMap = [];
+    private array $classesMap = [];
 
-    /** @var array */
-    private $classMethodMap = [];
+    private array $classMethodMap = [];
 
-    private $proxyClasses = [];
+    private array $proxyClasses = [];
 
     public function addClassMap(string $className, string $aspectName, array $methods, string $filePath): void
     {

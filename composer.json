@@ -7,16 +7,20 @@
     "php": ">=8.0",
     "nikic/php-parser": "^5.0"
   },
+  "require-dev": {
+    "workerman/webman-framework": "^1.6",
+    "php-di/php-di": "^7.0"
+  },
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "yzh52521\\aop\\": "src/"
+      "luoyue\\aop\\": "src/"
     }
   },
   "authors": [
     {
-      "name": "yzh52521",
-      "email": "396751927@qq.com"
+      "name": "luoyue",
+      "email": "1569097443@qq.com"
     }
   ]
 }

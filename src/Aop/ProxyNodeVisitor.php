@@ -1,7 +1,9 @@
 <?php
 
-namespace yzh52521\aop\Aop;
+namespace luoyue\aop\Aop;
 
+use luoyue\aop\Aop\Collects\ProxyCollects;
+use luoyue\aop\AopBootstrap;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
@@ -27,7 +29,6 @@ use PhpParser\Node\Stmt\Return_;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\TraitUse;
 use PhpParser\NodeVisitorAbstract;
-use yzh52521\aop\AopBootstrap;
 
 /**
  * Class ProxyNodeVisitor.
@@ -89,6 +90,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
                     $node->class = new Name($this->extends->toCodeString());
                     return $node;
                 }
+                break;
             case $node instanceof MagicConstFunction:
                 // Rewrite __FUNCTION__ to $__function__ variable.
                 if ($this->shouldUseTrait()) {

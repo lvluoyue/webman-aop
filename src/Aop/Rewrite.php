@@ -1,7 +1,8 @@
 <?php
 
-namespace yzh52521\aop\Aop;
+namespace luoyue\aop\Aop;
 
+use luoyue\aop\Aop\Collects\ProxyCollects;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;

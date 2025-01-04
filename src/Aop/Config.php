@@ -1,9 +1,9 @@
 <?php
-namespace yzh52521\aop\Aop;
+namespace luoyue\aop\Aop;
 
-use yzh52521\aop\Aop\Attributes\Parser\AspectParser;
-use yzh52521\aop\Aop\exception\ConfigException;
-use yzh52521\aop\Aop\interfaces\ProxyInterface;
+use luoyue\aop\Aop\Attributes\Parser\AspectParser;
+use luoyue\aop\Aop\exception\ConfigException;
+use luoyue\aop\Aop\interfaces\ProxyInterface;
 
 class Config
 {

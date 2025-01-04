@@ -1,19 +1,19 @@
 <?php
 
-namespace yzh52521\aop\Aop;
+namespace luoyue\aop\Aop\Collects;
 
-use yzh52521\aop\Aop\exception\ParseException;
-use yzh52521\aop\AopBootstrap;
+use luoyue\aop\Aop\Config;
+use luoyue\aop\Aop\exception\ParseException;
+use luoyue\aop\AopBootstrap;
 
 /**
  * Class ProxyClasses.
  */
 class AspectCollects
 {
-    /** @var Config */
-    private $config;
+    private Config $config;
 
-    private $aspectsClass = [];
+    private array $aspectsClass = [];
 
     public function __construct(Config $config)
     {
@@ -75,7 +75,7 @@ class AspectCollects
     }
 
     /**
-     * @return array|string[]
+     * @return string[]
      */
     private function parseAopClass(string $class): array
     {

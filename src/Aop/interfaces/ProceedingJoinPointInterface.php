@@ -1,6 +1,6 @@
 <?php
 
-namespace yzh52521\aop\Aop\interfaces;
+namespace luoyue\aop\Aop\interfaces;
 
 /**
  * Interface EntryClassInterface.

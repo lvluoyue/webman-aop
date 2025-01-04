@@ -1,6 +1,6 @@
 <?php
 
-namespace yzh52521\aop\Aop\exception;
+namespace luoyue\aop\Aop\exception;
 
 /**
  * Class ConfigException.

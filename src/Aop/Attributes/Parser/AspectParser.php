@@ -1,6 +1,6 @@
 <?php
 
-namespace yzh52521\aop\Aop\Attributes\Parser;
+namespace luoyue\aop\Aop\Attributes\Parser;
 
 use LinFly\Annotation\Contracts\IAnnotationParser;
 

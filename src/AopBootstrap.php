@@ -1,14 +1,14 @@
 <?php
 
-namespace yzh52521\aop;
+namespace luoyue\aop;
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
-use Webman\Bootstrap;
+use luoyue\aop\Aop\Collects\AspectCollects;
+use luoyue\aop\Aop\Collects\ProxyCollects;
+use luoyue\aop\Aop\Config;
+use luoyue\aop\Aop\Rewrite;
 use support\Container;
-use yzh52521\aop\Aop\AspectCollects;
-use yzh52521\aop\Aop\Config;
-use yzh52521\aop\Aop\ProxyCollects;
-use yzh52521\aop\Aop\Rewrite;
+use Webman\Bootstrap;
 
 class AopBootstrap implements Bootstrap
 {
@@ -23,15 +23,16 @@ class AopBootstrap implements Bootstrap
 
     private static ComposerClassLoader $composerClassLoader;
 
+    private static bool $isInit = false;
+
     public static function start($worker)
     {
         if ($worker) {
-            $config = config('plugin.yzh52521.aop.app');
-            if (!$config['enable']) {
+            $config = config('plugin.luoyue.aop.app');
+            if (!$config['enable'] || self::$isInit) {
                 return;
             }
-            $loaders = spl_autoload_functions();
-            foreach ($loaders as $loader) {
+            foreach (spl_autoload_functions() as $loader) {
                 if (isset($loader[0]) && $loader[0] instanceof ComposerClassLoader) {
                     self::$composerClassLoader = $loader[0];
                     self::$config = new Config($config);
@@ -43,8 +44,6 @@ class AopBootstrap implements Bootstrap
                     self::$proxyClasses = $proxyCollects->getProxyClasses();
                     self::$aspectClasses = $aspectCollects->getAspectsClass();
                     self::$classMap = $proxyCollects->getClassMap();
-                    spl_autoload_register([new self(), 'loadClass'], true, true);
-                    spl_autoload_unregister($loader);
                 }
             }
             self::init();
@@ -59,6 +58,7 @@ class AopBootstrap implements Bootstrap
     public static function init(): void
     {
         foreach (self::$proxyClasses as $proxyClass => $class) {
+            self::$composerClassLoader->addClassMap([$proxyClass => $class[0]]);
             if(Container::instance() instanceof \Webman\Container) {
                 $instance = new $proxyClass();
                 Container::set($class[1], $instance);
@@ -66,31 +66,7 @@ class AopBootstrap implements Bootstrap
                 Container::set($class[1], \DI\autowire($proxyClass));
             }
         }
-    }
-
-    /**
-     * @param $class
-     */
-    public function loadClass($class): bool
-    {
-        if (isset(self::$proxyClasses[$class]) && file_exists(self::$proxyClasses[$class][0])) {
-            $file = self::$proxyClasses[$class]['0'];
-        } else {
-            $file = self::$composerClassLoader->findFile($class);
-        }
-        if ($file) {
-            include_once($file);
-            return true;
-        }
-        return false;
-    }
-
-}
-
-if(!function_exists('includeFile')) {
-    function includeFile($file)
-    {
-        include_once $file;
+        self::$isInit = true;
     }
 
 }
