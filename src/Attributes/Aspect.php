@@ -1,13 +1,14 @@
 <?php
 
-namespace luoyue\aop\Aop\Attributes;
+namespace luoyue\aop\Attributes;
 
-use LinFly\Annotation\AbstractAnnotationAttribute;
-use luoyue\aop\Aop\Attributes\Parser\AspectParser;
+use luoyue\aop\Attributes\Parser\AspectParser;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class Aspect extends AbstractAnnotationAttribute
+class Aspect
 {
+
+
     public function __construct() {
     }
 

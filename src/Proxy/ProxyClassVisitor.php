@@ -5,7 +5,7 @@
  * @contact  mondagroup_php@163.com
  *
  */
-namespace luoyue\aop\Aop;
+namespace luoyue\aop\Proxy;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -19,14 +19,14 @@ class ProxyClassVisitor extends NodeVisitorAbstract
 
     public function __construct(string $proxyClassName)
     {
-        if (false !== strpos($proxyClassName, '\\')) {
+        if (str_contains($proxyClassName, '\\')) {
             $exploded = explode('\\', $proxyClassName);
             $proxyClassName = end($exploded);
         }
         $this->proxyClassName = $proxyClassName;
     }
 
-    public function leaveNode(Node $node)
+    public function leaveNode(Node $node): ?Node
     {
         // Rewrite the class name and extends the original class.
         if ($node instanceof Node\Stmt\Class_ && ! $node->isAnonymous()) {
@@ -34,5 +34,6 @@ class ProxyClassVisitor extends NodeVisitorAbstract
             $node->name = new Node\Identifier($this->proxyClassName);
             return $node;
         }
+        return null;
     }
 }

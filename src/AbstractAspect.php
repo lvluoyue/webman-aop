@@ -1,9 +1,9 @@
 <?php
 
-namespace luoyue\aop\Aop;
+namespace luoyue\aop;
 
-use luoyue\aop\Aop\interfaces\ProceedingJoinPointInterface;
-use luoyue\aop\Aop\interfaces\ProxyInterface;
+use luoyue\aop\interfaces\ProceedingJoinPointInterface;
+use luoyue\aop\interfaces\ProxyInterface;
 
 /**
  * Class AbstractAspect.
@@ -17,7 +17,7 @@ class AbstractAspect implements ProxyInterface
     /**
      * @return mixed
      */
-    public function process(ProceedingJoinPointInterface $entryClass)
+    public function process(ProceedingJoinPointInterface $entryClass): mixed
     {
         return $entryClass->process();
     }

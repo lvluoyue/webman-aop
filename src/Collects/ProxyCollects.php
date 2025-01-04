@@ -1,6 +1,6 @@
 <?php
 
-namespace luoyue\aop\Aop\Collects;
+namespace luoyue\aop\Collects;
 
 /**
  * Class ProxyCollects.

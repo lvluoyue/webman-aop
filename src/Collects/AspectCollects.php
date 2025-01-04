@@ -1,10 +1,10 @@
 <?php
 
-namespace luoyue\aop\Aop\Collects;
+namespace luoyue\aop\Collects;
 
-use luoyue\aop\Aop\Config;
-use luoyue\aop\Aop\exception\ParseException;
 use luoyue\aop\AopBootstrap;
+use luoyue\aop\Config;
+use luoyue\aop\exception\ParseException;
 
 /**
  * Class ProxyClasses.

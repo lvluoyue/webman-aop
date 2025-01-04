@@ -1,12 +1,14 @@
 <?php
 
-namespace luoyue\aop\Aop;
+namespace luoyue\aop\Proxy;
 
-use luoyue\aop\Aop\Collects\ProxyCollects;
 use luoyue\aop\AopBootstrap;
+use luoyue\aop\Collects\ProxyCollects;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\Closure;
@@ -36,27 +38,24 @@ use PhpParser\NodeVisitorAbstract;
 class ProxyNodeVisitor extends NodeVisitorAbstract
 {
 
-    private ProxyCollects $proxyCollects;
-
     private string $currentClass = '';
 
     private Identifier $class;
 
     private $extends = null;
 
-    public function __construct(ProxyCollects $proxyCollects)
+    public function __construct(private ProxyCollects $proxyCollects)
     {
-        $this->proxyCollects = $proxyCollects;
     }
 
-    public function beforeTraverse(array $nodes)
+    public function beforeTraverse(array $nodes): ?Node
     {
         foreach ($nodes as $namespace) {
             foreach ($namespace->stmts as $class) {
                 if ($class instanceof Node\Stmt\Class_) {
                     $this->class = $class->name;
                     $this->extends = $class->extends ?? null;
-                    $this->currentClass = $namespace->name->toString() . '\\' . $class->name;
+                    $this->currentClass = $namespace->name . '\\' . $class->name;
                     return null;
                 }
             }
@@ -64,12 +63,12 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    public function leaveNode(Node $node)
+    public function leaveNode(Node $node): ?Node
     {
         switch ($node) {
             case $node instanceof ClassMethod:
                 if (!$this->shouldRewrite($node)) {
-                    return $node;
+                    return $this->formatMethod($node);
                 }
                 return $this->rewriteMethod($node);
             case $node instanceof Trait_:
@@ -123,7 +122,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
      * Format a normal class method of no need proxy call.
      * @return ClassMethod
      */
-    private function formatMethod(ClassMethod $node)
+    private function formatMethod(ClassMethod $node): Node
     {
         if ('__construct' === $node->name->toString()) {
             // Rewrite parent::__construct to class::__construct.
@@ -158,12 +157,8 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
             new Node\Arg(new ClassConstFetch(new Name($class), new Identifier('class'))),
             // __FUNCTION__
             new Arg(new MagicConstFunction()),
-            // self::getParamMap(OriginalClass::class, __FUNCTION, func_get_args())
-            new Arg(new StaticCall(new Name('self'), '_getArguments', [
-                new Node\Arg(new ClassConstFetch(new Name($class), new Identifier('class'))),
-                new Arg(new MagicConstFunction()),
-                new Arg(new FuncCall(new Name('func_get_args'))),
-            ])),
+            // ['order' => ['param1', 'param2'], 'keys' => compact('param1', 'param2'), 'variadic' => 'param2']
+            new Arg($this->getArguments($node->getParams())),
             // A closure that wrapped original method code.
             new Arg(new Closure([
                 'params' => $this->filterModifier($node->getParams()),
@@ -197,6 +192,52 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
         }, $params);
     }
 
+    /**
+     * @param Node\Param[] $params
+     */
+    private function getArguments(array $params): Array_
+    {
+        if (empty($params)) {
+            return new Array_([
+                new ArrayItem(
+                    value: new Array_([], ['kind' => Array_::KIND_SHORT]),
+                    key: new String_('keys'),
+                ),
+            ], ['kind' => Array_::KIND_SHORT]);
+        }
+        // ['param1', 'param2', ...]
+        $methodParamsList = new Array_(
+            array_map(fn (Node\Param $param) => new ArrayItem(new String_($param->var->name)), $params),
+            ['kind' => Array_::KIND_SHORT]
+        );
+        return new Array_([
+            new ArrayItem(
+                value: $methodParamsList,
+                key: new String_('order'),
+            ),
+            new ArrayItem(
+                value: new FuncCall(new Name('compact'), [new Arg($methodParamsList)]),
+                key: new String_('keys')
+            ),
+            new ArrayItem(
+                value: $this->getVariadicParamName($params),
+                key: new String_('variadic'),
+            )], ['kind' => Array_::KIND_SHORT]);
+    }
+
+    /**
+     * @param Node\Param[] $params
+     */
+    private function getVariadicParamName(array $params): String_
+    {
+        foreach ($params as $param) {
+            if ($param->variadic) {
+                return new String_($param->var->name);
+            }
+        }
+        return new String_('');
+    }
+
     private function unshiftMagicMethods($stmts = []): array
     {
         $magicConstFunction = new Expression(new Assign(new Variable('__function__'), new MagicConstFunction()));
@@ -216,7 +257,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
 
     private function shouldRewrite(Node $node): bool
     {
-        return $this->currentClass && $this->proxyCollects->shouldRewrite($this->currentClass, $node->name->toString());
+        return $this->currentClass && $this->proxyCollects->shouldRewrite($this->currentClass, $node->name);
     }
 
     private function shouldUseTrait(): bool

@@ -1,6 +1,6 @@
 <?php
 
-namespace luoyue\aop\Aop\exception;
+namespace luoyue\aop\exception;
 
 /**
  * Class ParseException.
