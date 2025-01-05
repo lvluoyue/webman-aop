@@ -8,6 +8,7 @@ use luoyue\aop\Collects\ProxyCollects;
 use luoyue\aop\Proxy\Rewrite;
 use support\Container;
 use Webman\Bootstrap;
+use Workerman\Worker;
 
 class AopBootstrap implements Bootstrap
 {
@@ -24,11 +25,11 @@ class AopBootstrap implements Bootstrap
 
     private static bool $isInit = false;
 
-    private static $workerName;
+    private static string $workerName;
 
-    public static function start($worker)
+    public static function start(?Worker $worker): void
     {
-        self::$workerName = $worker?->name ?? '';
+        self::$workerName = $worker?->name ?? 'master';
         $config = config('plugin.luoyue.aop.app');
         if (self::$workerName == 'monitor' || !$config['enable'] || self::$isInit) {
             return;
@@ -40,19 +41,15 @@ class AopBootstrap implements Bootstrap
             echo '[Process:' . self::$workerName . '] Start load aop class...' . PHP_EOL;
             $time = microtime(true);
         }
-        foreach (ComposerClassLoader::getRegisteredLoaders() as $loader) {
-            if ($loader instanceof ComposerClassLoader) {
-                self::$composerClassLoader = $loader;
-                $proxyCollects = new ProxyCollects();
-                $aspectCollects = new AspectCollects(self::$config);
-                $aspectCollects->collectProxy($proxyCollects);
-                (new Rewrite(self::$config, $proxyCollects))->rewrite();
-                self::$proxyClasses = $proxyCollects->getProxyClasses();
-                self::$aspectClasses = $aspectCollects->getAspectsClass();
-                self::$classMap = $proxyCollects->getClassMap();
-                break;
-            }
-        }
+        self::$composerClassLoader = current(ComposerClassLoader::getRegisteredLoaders());
+        $proxyCollects = new ProxyCollects();
+        $aspectCollects = new AspectCollects(self::$config);
+        $aspectCollects->collectProxy($proxyCollects);
+        (new Rewrite(self::$config, $proxyCollects))->rewrite();
+        self::$proxyClasses = $proxyCollects->getProxyClasses();
+        self::$aspectClasses = $aspectCollects->getAspectsClass();
+        self::$classMap = $proxyCollects->getClassMap();
+
         self::init();
 
         if ($isFirstWorker) {
@@ -65,10 +62,11 @@ class AopBootstrap implements Bootstrap
     {
         foreach (self::$proxyClasses as $proxyClass => $class) {
             self::$composerClassLoader->addClassMap([$proxyClass => $class[0]]);
-            if (Container::instance() instanceof \Webman\Container) {
-                Container::set($class[1], Container::get($proxyClass));
-            } else if (Container::instance() instanceof \DI\Container) {
-                Container::set($class[1], \DI\autowire($proxyClass));
+            $container = Container::instance();
+            if ($container instanceof \Webman\Container) {
+                Container::make($class[1], Container::get($proxyClass));
+            } else if ($container instanceof \DI\Container) {
+                $container->set($class[1], \DI\autowire($proxyClass));
             }
         }
         self::$isInit = true;

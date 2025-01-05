@@ -14,9 +14,6 @@ class AbstractAspect implements ProxyInterface
     //类名 . '::方法明' eg: Index:class . '::hello'
     public array $classes = [];
 
-    /**
-     * @return mixed
-     */
     public function process(ProceedingJoinPointInterface $entryClass): mixed
     {
         return $entryClass->process();
