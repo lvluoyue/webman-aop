@@ -5,6 +5,9 @@ namespace luoyue\aop\Proxy;
 use luoyue\aop\exception\ProceedingJoinPointException;
 use luoyue\aop\interfaces\ProceedingJoinPointInterface;
 use Closure;
+use ReflectionFunction;
+use ReflectionMethod;
+use support\Container;
 
 /**
  * Class EntryClass.
@@ -14,16 +17,39 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
 
     public ?Closure $pipe;
 
+    /** @var ReflectionMethod[] */
+    private static array $reflectMethods;
+
+    /** @var object[] */
+    private static array $instances;
+
     public function __construct(public string $className,
-                                public string $classMethod,
+                                public string $methodName,
                                 public array $arguments,
                                 public Closure $originalMethod)
     {
     }
 
-    public function getClassMethod(): string
+    public function process(): mixed
     {
-        return $this->classMethod;
+        $c = $this->pipe;
+        if (! $this->pipe instanceof Closure) {
+            throw new ProceedingJoinPointException('entry class pipe must be closure');
+        }
+        return $c($this);
+    }
+
+    public function processOriginalMethod()
+    {
+        $this->pipe = null;
+        $closure = $this->originalMethod;
+        $arguments = $this->getArguments();
+        return $closure(...$arguments);
+    }
+
+    public function getMethodName(): string
+    {
+        return $this->methodName;
     }
 
     public function getClassName(): string
@@ -46,20 +72,15 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
         return $result;
     }
 
-    public function process(): mixed
+    public function getReflectMethod(): ReflectionMethod
     {
-        $c = $this->pipe;
-        if (! $this->pipe instanceof Closure) {
-            throw new ProceedingJoinPointException('entry class pipe must be closure');
-        }
-        return $c($this);
+        return self::$reflectMethods[$this->className . $this->methodName] ??=
+            new ReflectionMethod(Container::get($this->className), $this->methodName);
     }
 
-    public function processOriginalMethod()
+    public function getInstance(): ?object
     {
-        $this->pipe = null;
-        $closure = $this->originalMethod;
-        $arguments = $this->getArguments();
-        return $closure(...$arguments);
+        return self::$reflectMethods[$this->className . $this->methodName] ??=
+            (new ReflectionFunction($this->originalMethod))->getClosureThis();
     }
 }
