@@ -1,21 +1,10 @@
 # webman-aop
 
-<a href="https://packagist.org/packages/luoyue/webman-aop">
-    <img src="http://poser.pugx.org/luoyue/webman-aop/version.svg" alt="Latest Stable Version">
-</a>
-<a href="https://packagist.org/packages/luoyue/webman-aop">
-    <img src="http://poser.pugx.org/luoyue/webman-aop/downloads.svg" alt="Total Downloads">
-</a>
-<a href="https://packagist.org/packages/luoyue/webman-aop">
-    <img src="http://poser.pugx.org/luoyue/webman-aop/v/unstable.svg" alt="Latest Unstable Version">
-</a>
-<a href="https://packagist.org/packages/luoyue/webman-aop">
-    <img src="http://poser.pugx.org/luoyue/webman-aop/license.svg" alt="License">
-</a>
-<a href="https://packagist.org/packages/luoyue/webman-aop">
-    <img src="http://poser.pugx.org/luoyue/webman-aop/require/php" alt="PHP Version Require">
-</a>
-
+![Packagist Version](https://img.shields.io/packagist/v/luoyue/webman-aop)
+![Packagist License](https://img.shields.io/packagist/l/luoyue/webman-aop)
+![Packagist Dependency Version](https://img.shields.io/packagist/dependency-v/luoyue/webman-aop/php)
+![Packagist Downloads](https://img.shields.io/packagist/dt/luoyue/webman-aop)
+![Packagist Stars](https://img.shields.io/packagist/stars/luoyue/webman-aop)
 
 ## 安装
 ```
