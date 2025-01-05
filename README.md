@@ -1,11 +1,10 @@
 # webman-aop
 
-[<img alt="Latest Stable Version" src="http://poser.pugx.org/luoyue/webman-aop/v"/>](https://packagist.org/packages/luoyue/webman-aop)
-[<img alt="Total Downloads" src="http://poser.pugx.org/luoyue/webman-aop/downloads"/>](https://packagist.org/packages/luoyue/webman-aop)
-[<img alt="Latest Unstable Version" src="http://poser.pugx.org/luoyue/webman-aop/v/unstable"/>](https://packagist.org/packages/luoyue/webman-aop)
-[<img alt="License" src="http://poser.pugx.org/luoyue/webman-aop/license"/>](https://packagist.org/packages/luoyue/webman-aop)
-[<img alt="PHP Version Require" src="http://poser.pugx.org/luoyue/webman-aop/require/php"/>](https://packagist.org/packages/luoyue/webman-aop)
-
+[![Latest Stable Version](http://poser.pugx.org/luoyue/webman-aop/version.svg)](https://packagist.org/packages/luoyue/webman-aop)
+[![Total Downloads](http://poser.pugx.org/luoyue/webman-aop/downloads.svg)](https://packagist.org/packages/luoyue/webman-aop)
+[![Latest Unstable Version](http://poser.pugx.org/luoyue/webman-aop/v/unstable.svg)](https://packagist.org/packages/luoyue/webman-aop)
+[![License](http://poser.pugx.org/luoyue/webman-aop/license.svg)](https://packagist.org/packages/luoyue/webman-aop)
+[![PHP Version Require](http://poser.pugx.org/luoyue/webman-aop/require/php)](https://packagist.org/packages/luoyue/webman-aop)
 
 ## 安装
 ```
