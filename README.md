@@ -1,15 +1,29 @@
-# 安装
+# webman-aop
+
+[![Latest Stable Version](http://poser.pugx.org/luoyue/webman-aop/v)](https://packagist.org/packages/luoyue/webman-aop)
+[![Total Downloads](http://poser.pugx.org/luoyue/webman-aop/downloads)](https://packagist.org/packages/luoyue/webman-aop)
+[![Latest Unstable Version](http://poser.pugx.org/luoyue/webman-aop/v/unstable)](https://packagist.org/packages/luoyue/webman-aop)
+[![License](http://poser.pugx.org/luoyue/webman-aop/license)](https://packagist.org/packages/luoyue/webman-aop)
+[![PHP Version Require](http://poser.pugx.org/luoyue/webman-aop/require/php)](https://packagist.org/packages/luoyue/webman-aop)
+
+
+## 安装
 ```
-composer require yzh52521/webman-aop
+composer require luoyue/webman-aop
 ```
 
 AOP 相关配置
-config/plugin/yzh52521/aop/app.php 配置
+config/plugin/luoyue/aop/app.php 配置
 ```
 <?php
 return [
+    'enable' => true,
+    // 切入对象的扫描路径
+    'scans' => [
+        'app',
+    ],
+    // 切入的切面类
     'aspect' => [
-        \app\aspect\UserAspect::class,
     ],
 ];
 ```
@@ -26,23 +40,25 @@ class UserService
     }
 }
 ```
-其次新增对应的 UserAspect
+其次新增对应的 UserAspect（Aspect注解必须加上）
 
 ```
 
 namespace app\aspect;
 
 use app\service\UserService;
-use yzh52521\aop\Aop\AbstractAspect;
-use yzh52521\aop\Aop\interfaces\ProceedingJoinPointInterface;
+use luoyue\aop\AbstractAspect;
+use luoyue\aop\Attributes\Aspect;
+use luoyue\aop\interfaces\ProceedingJoinPointInterface;
 
 /**
  * Class UserAspect
  * @package app\aspect
  */
+ #[Aspect]
 class UserAspect extends AbstractAspect
 {
-    public $classes = [
+    public array $classes = [
         UserService::class . '::info',
     ];
 
@@ -94,5 +110,25 @@ if (! function_exists('load')) {
 }
 ```
 
+使用php-di依赖可以使用注解在容器中注入对象达到切入的目的，例如：
 
 
+```
+<?php
+
+namespace app\controller;
+
+use app\service\UserService;
+use DI\Attribute\Inject;
+
+class Index
+{
+    #[Inject]
+    public UserService $userService;
+
+    public function index()
+    {
+        $this->userService->info();
+    }
+}
+```
