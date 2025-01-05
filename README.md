@@ -1,5 +1,5 @@
 # webman-aop
-[![Latest Stable Version](http://poser.pugx.org/phpunit/phpunit/v)](https://packagist.org/packages/phpunit/phpunit) [![Total Downloads](http://poser.pugx.org/phpunit/phpunit/downloads)](https://packagist.org/packages/phpunit/phpunit) [![Latest Unstable Version](http://poser.pugx.org/phpunit/phpunit/v/unstable)](https://packagist.org/packages/phpunit/phpunit) [![License](http://poser.pugx.org/phpunit/phpunit/license)](https://packagist.org/packages/phpunit/phpunit) [![PHP Version Require](http://poser.pugx.org/phpunit/phpunit/require/php)](https://packagist.org/packages/phpunit/phpunit)
+[![Latest Stable Version](http://poser.pugx.org/luoyue/webman-aop/v)](https://packagist.org/packages/luoyue/webman-aop) [![Total Downloads](http://poser.pugx.org/luoyue/webman-aop/downloads)](https://packagist.org/packages/luoyue/webman-aop) [![Latest Unstable Version](http://poser.pugx.org/luoyue/webman-aop/v/unstable)](https://packagist.org/packages/luoyue/webman-aop) [![License](http://poser.pugx.org/luoyue/webman-aop/license)](https://packagist.org/packages/luoyue/webman-aop) [![PHP Version Require](http://poser.pugx.org/luoyue/webman-aop/require/php)](https://packagist.org/packages/luoyue/webman-aop)
 
 ## 安装
 ```
