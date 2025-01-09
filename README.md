@@ -93,7 +93,8 @@ UserAspect before
 UserService info
 UserAspect after 
 ```
-#切入顺序
+
+## 切入顺序
 如果有多个切面类对同一个类方法进行切入， 会按照配置文件中顺序执行
 
 容器 load 函数在 helpers.php 定义如下 eg:
@@ -131,3 +132,10 @@ class Index
     }
 }
 ```
+
+## clsses表达式
+目前支持的表达式有：
+- ***匹配一个方法***：类名::方法名
+- ***匹配所有方法***：类名::*
+
+其他写法暂不支持，随时欢迎您提交pr
