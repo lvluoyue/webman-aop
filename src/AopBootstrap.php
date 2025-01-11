@@ -41,7 +41,7 @@ class AopBootstrap implements Bootstrap
             echo '[Process:' . self::$workerName . '] Start load aop class...' . PHP_EOL;
             $time = microtime(true);
         }
-        self::$composerClassLoader = current(ComposerClassLoader::getRegisteredLoaders());
+
         $proxyCollects = new ProxyCollects();
         $aspectCollects = new AspectCollects(self::$config);
         $aspectCollects->collectProxy($proxyCollects);
@@ -61,7 +61,7 @@ class AopBootstrap implements Bootstrap
     public static function init(): void
     {
         foreach (self::$proxyClasses as $proxyClass => $class) {
-            self::$composerClassLoader->addClassMap([$proxyClass => $class[0]]);
+            self::getComposerClassLoader()->addClassMap([$proxyClass => $class[0]]);
             $container = Container::instance();
             if ($container instanceof \Webman\Container) {
                 Container::make($class[1], Container::get($proxyClass));
@@ -74,7 +74,7 @@ class AopBootstrap implements Bootstrap
 
     public static function getComposerClassLoader(): ?ComposerClassLoader
     {
-        return static::$composerClassLoader ?? null;
+        return static::$composerClassLoader ??= current(ComposerClassLoader::getRegisteredLoaders()) ?? null;
     }
 
 }

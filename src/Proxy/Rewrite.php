@@ -31,7 +31,7 @@ class Rewrite
             $traverser = new NodeTraverser();
             $code = file_get_contents($item['filePath']);
             $ast = $this->parser->parse($code);
-            $proxyClassName = $className . '_' . md5($className);
+            $proxyClassName = $className . '_' . crc32($className);
             $traverser->addVisitor(new ProxyClassVisitor($proxyClassName));
             $traverser->addVisitor(new ProxyNodeVisitor($this->proxyCollects));
             $newAst = $traverser->traverse($ast);
