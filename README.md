@@ -67,7 +67,7 @@ class UserAspect extends AbstractAspect
      * @param ProceedingJoinPointInterface $entryClass
      * @return mixed
      */
-    public function process(ProceedingJoinPointInterface $entryClass)
+    public function process(ProceedingJoinPointInterface $entryClass): mixed
     {
         var_dump('UserAspect before');
         $res = $entryClass->process();
