@@ -28,6 +28,9 @@ class Config
         }
         array_map([$this, 'recursiveScan'], $this->config['scans']);
         array_map([$this, 'mergeAspectClass'], $this->config['aspect']);
+        if (!file_exists($this->path)) {
+            mkdir($this->path, 0777, true);
+        }
     }
 
     public function getAspectsClasses(): array

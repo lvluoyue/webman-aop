@@ -20,9 +20,6 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
     /** @var ReflectionMethod[] */
     private static array $reflectMethods;
 
-    /** @var object[] */
-    private static array $instances;
-
     public function __construct(public string $className,
                                 public string $methodName,
                                 public array $arguments,

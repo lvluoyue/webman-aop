@@ -6,6 +6,8 @@
 ![Packagist Downloads](https://img.shields.io/packagist/dt/luoyue/webman-aop)
 ![Packagist Stars](https://img.shields.io/packagist/stars/luoyue/webman-aop)
 
+> 注意：本插件依赖container容器，当切入对象不在容器中时，aop无法生效
+
 ## 安装
 ```
 composer require luoyue/webman-aop
@@ -95,7 +97,7 @@ UserAspect after
 ```
 
 ## 切入顺序
-如果有多个切面类对同一个类方法进行切入， 会按照配置文件中顺序执行
+如果有多个切面类对同一个类方法进行切入， 会按照文件名字母升序执行
 
 容器 load 函数在 helpers.php 定义如下 eg:
 ```
@@ -135,7 +137,7 @@ class Index
 
 ## clsses表达式
 目前支持的表达式有：
-- ***匹配一个方法***：类名::方法名
-- ***匹配所有方法***：类名::*
+- ***匹配一个方法***：`类名::方法名`
+- ***匹配所有方法***：`类名::*` 或 `类名`
 
 其他写法暂不支持，随时欢迎您提交pr
