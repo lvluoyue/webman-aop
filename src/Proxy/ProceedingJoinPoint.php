@@ -36,7 +36,7 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
         return $c($this);
     }
 
-    public function processOriginalMethod()
+    public function processOriginalMethod(): mixed
     {
         $this->pipe = null;
         $closure = $this->originalMethod;

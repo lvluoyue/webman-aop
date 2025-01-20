@@ -3,6 +3,8 @@
 namespace luoyue\aop;
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
+use LinFly\Annotation\Bootstrap\AnnotationBootstrap;
+use luoyue\aop\Attributes\parser\AspectParser;
 use luoyue\aop\Collects\AspectCollects;
 use luoyue\aop\Collects\ProxyCollects;
 use luoyue\aop\Proxy\Rewrite;
@@ -30,7 +32,6 @@ class AopBootstrap implements Bootstrap
         if ($workerName == 'monitor' || !$config['enable'] || self::$isInit) {
             return;
         }
-
         $config = new Config($config);
         $isFirstWorker = $worker?->id === 0;
         if ($isFirstWorker) {
