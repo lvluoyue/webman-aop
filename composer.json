@@ -5,6 +5,7 @@
   "type": "library",
   "require": {
     "php": ">=8.1",
+    "linfly/annotation": "^2.1",
     "nikic/php-parser": "^5.0"
   },
   "require-dev": {

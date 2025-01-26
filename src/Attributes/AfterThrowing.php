@@ -2,6 +2,7 @@
 
 namespace luoyue\aop\Attributes;
 
+use LinFly\Annotation\AbstractAnnotationAttribute;
 use luoyue\aop\Attributes\parser\AspectParser;
 
 #[\Attribute(\Attribute::TARGET_METHOD)]
