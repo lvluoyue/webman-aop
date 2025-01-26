@@ -57,10 +57,6 @@ class AspectCollects
         }
     }
 
-    public function scanTargetMethods()
-    {
-    }
-
     /**
      * 获取所有class表达式
      * @return Generator
