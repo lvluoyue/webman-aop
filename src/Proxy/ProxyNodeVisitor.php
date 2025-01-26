@@ -4,6 +4,7 @@ namespace luoyue\aop\Proxy;
 
 use luoyue\aop\AopBootstrap;
 use luoyue\aop\Collects\ProxyCollects;
+use luoyue\aop\Collects\TargetData;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
@@ -44,7 +45,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
 
     private $extends = null;
 
-    public function __construct(private ProxyCollects $proxyCollects)
+    public function __construct(private TargetData $proxyCollects)
     {
     }
 
@@ -83,6 +84,10 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
                 }
                 $node->stmts = $stmts;
                 unset($stmts);
+                if(!$node->isAnonymous()) {
+                    $node->extends = new Node\Name($node->name->name);
+                    $node->name = new Node\Identifier($this->proxyCollects->getProxyClassName());
+                }
                 return $node;
             case ($node instanceof StaticPropertyFetch || $node instanceof StaticCall) && $this->extends:
                 if ($node->class instanceof Node\Name && 'parent' === $node->class->toString()) {
@@ -257,11 +262,11 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
 
     private function shouldRewrite(Node $node): bool
     {
-        return $this->currentClass && $this->proxyCollects->shouldRewrite($this->currentClass, $node->name);
+        return $this->currentClass && $this->proxyCollects->shouldRewriteMethod($node->name);
     }
 
     private function shouldUseTrait(): bool
     {
-        return $this->currentClass && $this->proxyCollects->shouldUseTrait($this->currentClass);
+        return $this->currentClass;
     }
 }

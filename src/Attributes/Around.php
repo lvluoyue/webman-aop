@@ -5,17 +5,18 @@ namespace luoyue\aop\Attributes;
 use LinFly\Annotation\AbstractAnnotationAttribute;
 use luoyue\aop\Attributes\parser\AspectParser;
 
-#[\Attribute(\Attribute::TARGET_CLASS)]
-class Aspect extends AbstractAnnotationAttribute
+#[\Attribute(\Attribute::TARGET_METHOD)]
+class Around extends AbstractAnnotationAttribute
 {
 
-    public function __construct() {
+    public function __construct(array|string $classes)
+    {
+        $this->setArguments(func_get_args());
     }
 
     public static function getParser(): array|string
     {
         return AspectParser::class;
     }
-
 
 }

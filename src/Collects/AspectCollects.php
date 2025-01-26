@@ -3,89 +3,77 @@
 namespace luoyue\aop\Collects;
 
 use luoyue\aop\AopBootstrap;
-use luoyue\aop\Config;
-use luoyue\aop\exception\ParseException;
+use Generator;
+use ReflectionClass;
+use SplFileInfo;
+use support\Container;
 
 /**
  * Class ProxyClasses.
  */
 class AspectCollects
 {
-    private Config $config;
 
+    /** @var AspectData[] $aspectsClass */
     private array $aspectsClass = [];
 
-    public function __construct(Config $config)
+    public function setAspects(AspectData $aspectsClass)
     {
-        $this->config      = $config;
+        $this->aspectsClass[] = $aspectsClass;
     }
 
     /**
-     * getAspectsClass.
+     * 扫描切面目录
+     * @param string $dir
+     * @return void
      */
-    public function getAspectsClass(): array
+    public function scan(string $dir): void
     {
-        return $this->aspectsClass;
-    }
-
-    /**
-     * @throws \ReflectionException
-     */
-    public function collectProxy(ProxyCollects $proxyCollects): void
-    {
-        $array = [];
-        foreach ($this->config->getAspectsClasses() as $aspectsClass) {
-            $aopClasses = $this->parseAspectClass($aspectsClass, $proxyCollects);
-            if (empty($aopClasses)) {
-                continue;
-            }
-            $array[$aspectsClass] = $aopClasses;
-        }
-        $this->aspectsClass = $array;
-    }
-
-    /**
-     * @throws \ReflectionException
-     */
-    private function parseAspectClass(string $class, ProxyCollects $proxyCollects): array
-    {
-        $aspectReflect   = new \ReflectionClass($class);
-        $classesProperty = $aspectReflect->getProperty('classes');
-        /** @var array $aopClasses */
-        $aopClasses = $classesProperty->getValue(new $class());
-        if (empty($aopClasses)) {
-            return [];
-        }
-        $aopCollects = [];
-        foreach ($aopClasses as $item) {
-            if (!is_string($item)) {
-                throw new ParseException(sprintf('class : %s, property: classes : value error, string wanted', $class));
-            }
-            [$aopClass, $aopMethod] = $this->parseAopClass($item);
-            if ($aopClass) {
-                $aopCollects[$aopClass] = array_merge($aopCollects[$aopClass] ?? [], [$aopMethod]);
+        /** @var ProxyCollects $proxyCollects */
+        $proxyCollects = Container::get(ProxyCollects::class);
+        $dirIterator = new \RecursiveDirectoryIterator($dir);
+        $iterator = new \RecursiveIteratorIterator($dirIterator);
+        /** @var SplFileInfo $file */
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getExtension() == 'php') {
+                // 根据文件路径获取类名
+                $className = str_replace(['./', '../', '/'], ['', '', '\\'], substr($file->getPathname(), 0, -4));
+                foreach ($this->getAspectsClasses() as $data) {
+                    /** @var AspectData $aspect */
+                    [$aspect, $class, $matchesMethod] = array_values($data);
+                    if(preg_match("#^{$class}$#", $className)) {
+                        $filePath = AopBootstrap::getComposerClassLoader()->findFile($className);
+                        $targetData = $proxyCollects->getTargetData($className, $filePath);
+                        $reflectionClass = new ReflectionClass($className);
+                        foreach ($reflectionClass->getMethods() as $method) {
+                            if(preg_match("#^{$matchesMethod}$#", $method->getName())) {
+                                $targetData->addTargetClass($method->getName(), $aspect);
+                            }
+                        }
+                        $aspect->addTargetData($targetData);
+                    }
+                }
             }
         }
+    }
 
-        foreach ($aopCollects as $className => $methods) {
-            $proxyCollects->addClassMap($className, $class, $methods, AopBootstrap::getComposerClassLoader()->findFile($className));
-        }
-        $proxyCollects->setMethodMaps();
-        return $aopCollects;
+    public function scanTargetMethods()
+    {
     }
 
     /**
-     * @return string[]
+     * 获取所有class表达式
+     * @return Generator
      */
-    private function parseAopClass(string $class): array
+    private function getAspectsClasses(): Generator
     {
-        $infos = explode('::', $class);
-        if (1 === count($infos) && class_exists($class)) {
-            return [$class, '*'];
+        foreach ($this->aspectsClass as $aspectsClass) {
+            foreach ($aspectsClass->getAspectClasses() as $class) {
+                yield [
+                    'aspect' => $aspectsClass,
+                    ...$class,
+                ];
+            }
         }
-        if (2 === count($infos) && class_exists($infos[0]) && !empty($infos[1])) {
-            return [$infos[0], $infos[1]];
-        }
-        return ['', ''];
     }
 }

@@ -2,8 +2,7 @@
 
 namespace luoyue\aop\Proxy;
 
-use luoyue\aop\Collects\ProxyCollects;
-use luoyue\aop\Config;
+use luoyue\aop\Collects\TargetData;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
@@ -19,28 +18,32 @@ class Rewrite
 
     private Standard $prettyPrinter;
 
-    public function __construct(private Config $config, private ProxyCollects $proxyCollects)
+    public function __construct()
     {
         $this->parser = (new ParserFactory())->createForHostVersion();
         $this->prettyPrinter = new Standard();
     }
 
-    public function rewrite()
+    public function rewrite(string $className, TargetData $item)
     {
-        foreach ($this->proxyCollects->getClassMap() as $className => &$item) {
-            $traverser = new NodeTraverser();
-            $code = file_get_contents($item['filePath']);
-            $ast = $this->parser->parse($code);
-            $proxyClassName = $className . '_' . crc32($className);
-            $traverser->addVisitor(new ProxyClassVisitor($proxyClassName));
-            $traverser->addVisitor(new ProxyNodeVisitor($this->proxyCollects));
-            $newAst = $traverser->traverse($ast);
-            $newCode = $this->prettyPrinter->prettyPrintFile($newAst);
-            $filePath = $this->getProxyFilePath($className);
-            file_put_contents($filePath, $newCode);
-            $this->proxyCollects->setNewPath($className, $filePath);
-            $this->proxyCollects->setProxyClassName($className, $proxyClassName, $filePath);
+        $traverser = new NodeTraverser();
+        $code = file_get_contents($item->getClassFile());
+        $ast = $this->parser->parse($code);
+        $traverser->addVisitor(new ProxyNodeVisitor($item));
+        $newAst = $traverser->traverse($ast);
+        $newCode = $this->prettyPrinter->prettyPrintFile($newAst);
+        $proxyFile = $this->getProxyPath() . $item->getProxyFile();
+        file_put_contents($proxyFile, $newCode);
+        return $proxyFile;
+    }
+
+    private function getProxyPath()
+    {
+        $path = base_path() . config('plugin.luoyue.aop.app.proxy_path', '/runtime/aopCache/proxyClasses') . DIRECTORY_SEPARATOR;
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
         }
+        return $path;
     }
 
     /**

@@ -15,58 +15,36 @@ use Workerman\Worker;
 class AopBootstrap implements Bootstrap
 {
 
-    public static array $proxyClasses = [];
-
-    public static array $aspectClasses = [];
-
-    public static array $classMap = [];
-
     private static ComposerClassLoader $composerClassLoader;
-
-    private static bool $isInit = false;
 
     public static function start(?Worker $worker): void
     {
         $workerName = $worker?->name ?? 'master';
         $config = config('plugin.luoyue.aop.app');
-        if ($workerName == 'monitor' || !$config['enable'] || self::$isInit) {
+        if ($workerName == 'monitor' || !$config['enable']) {
             return;
         }
-        $config = new Config($config);
+
         $isFirstWorker = $worker?->id === 0;
         if ($isFirstWorker) {
             echo '[Process:' . $workerName . '] Start load aop class...' . PHP_EOL;
             $time = microtime(true);
         }
 
-        $proxyCollects = new ProxyCollects();
-        $aspectCollects = new AspectCollects($config);
-        $aspectCollects->collectProxy($proxyCollects);
-        (new Rewrite($config, $proxyCollects))->rewrite();
-        self::$proxyClasses = $proxyCollects->getProxyClasses();
-        self::$aspectClasses = $aspectCollects->getAspectsClass();
-        self::$classMap = $proxyCollects->getClassMap();
+        /** @var AspectCollects $aspectCollects */
+        $aspectCollects = Container::get(AspectCollects::class);
+        foreach ($config['scans'] as $scan) {
+            $aspectCollects->scan($scan);
+        }
 
-        self::init();
+        /** @var ProxyCollects $proxyCollects */
+        $proxyCollects = Container::get(ProxyCollects::class);
+        $proxyCollects->scan();
 
         if ($isFirstWorker) {
             $time = round(microtime(true) - $time, 3);
             echo '[Process:' . $workerName . '] Load aop class completed, time: ' . $time . 's' . PHP_EOL;
         }
-    }
-
-    public static function init(): void
-    {
-        foreach (self::$proxyClasses as $proxyClass => $class) {
-            self::getComposerClassLoader()->addClassMap([$proxyClass => $class[0]]);
-            $container = Container::instance();
-            if ($container instanceof \Webman\Container) {
-                Container::make($class[1], Container::get($proxyClass));
-            } else if ($container instanceof \DI\Container) {
-                $container->set($class[1], \DI\autowire($proxyClass));
-            }
-        }
-        self::$isInit = true;
     }
 
     public static function getComposerClassLoader(): ?ComposerClassLoader

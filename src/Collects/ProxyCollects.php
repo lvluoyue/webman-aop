@@ -2,93 +2,55 @@
 
 namespace luoyue\aop\Collects;
 
+use luoyue\aop\AopBootstrap;
+use luoyue\aop\Proxy\Rewrite;
+use support\Container;
+
 /**
  * Class ProxyCollects.
  */
 class ProxyCollects
 {
-    private array $classesMap = [];
+    private array $targetClassMap = [];
 
-    private array $classMethodMap = [];
-
-    private array $proxyClasses = [];
-
-    public function addClassMap(string $className, string $aspectName, array $methods, string $filePath): void
+    public function scan()
     {
-        if (empty($filePath)) {
-            return;
-        }
-        if (!isset($this->classesMap[$className])) {
-            $this->classesMap[$className] = [
-                'aspects'  => [],
-                'methods'  => [],
-                'filePath' => $filePath,
-            ];
-        }
-        $this->classesMap[$className]['aspects'][] = $aspectName;
-        $this->classesMap[$className]['methods']   = array_merge($this->classesMap[$className]['methods'], $methods);
-        if (!isset($this->classMethodMap[$className])) {
-            $this->classMethodMap[$className] = [];
-        }
-        foreach ($methods as $method) {
-            if (!isset($this->classMethodMap[$className][$method])) {
-                $this->classMethodMap[$className][$method] = [];
-            }
-            $this->classMethodMap[$className][$method][] = $aspectName;
-        }
-        foreach ($methods as $method) {
-            $this->classMethodMap[$className][$method] = array_unique($this->classMethodMap[$className][$method]);
-        }
-    }
-
-    public function setMethodMaps(): void
-    {
-        foreach ($this->classMethodMap as $aopClass => $methodMap) {
-            if (isset($this->classesMap[$aopClass])) {
-                $this->classesMap[$aopClass]['methodsMap'] = $methodMap;
+        $rewrite = new Rewrite();
+        /**
+         * @var string $className
+         * @var TargetData $targetClass
+         */
+        foreach ($this->targetClassMap as $className => $targetClass) {
+            $proxyClass = $targetClass->getProxyClassName(true);
+            $proxyFile = $rewrite->rewrite($className, $targetClass);
+            $container = Container::instance();
+            AopBootstrap::getComposerClassLoader()->addClassMap([$proxyClass => $proxyFile]);
+            if ($container instanceof \Webman\Container) {
+                Container::make($className, Container::get($proxyClass));
+            } else if ($container instanceof \DI\Container) {
+                $container->set($className, \DI\autowire($proxyClass));
             }
         }
     }
 
-    public function setNewPath(string $className, string $filePath): void
+    public function getTargetData(string $className, string $filePath): TargetData
     {
-        $this->classesMap[$className]['newPath'] = $filePath;
+        return $this->targetClassMap[$className] ??= new TargetData($className, $filePath);
     }
 
-    public function setProxyClassName(string $className, string $proxyClassName, string $path): void
+    public function getAspectsClosure(string $className, string $method): array
     {
-        $this->classesMap[$className]['proxyClassName'] = $proxyClassName;
-        $this->proxyClasses[$proxyClassName]            = [$path, $className];
-    }
-
-    public function getProxyClasses(): array
-    {
-        return $this->proxyClasses;
-    }
-
-    /**
-     * @param $className
-     */
-    public function shouldAllRewrite($className): bool
-    {
-        return in_array('*', $this->classesMap[$className]['methods'] ?? [], true);
-    }
-
-    public function shouldRewrite(string $className, string $method): bool
-    {
-        if ($this->shouldAllRewrite($className)) {
-            return true;
+        if (!isset($this->targetClassMap[$className])) {
+            return [];
         }
-        return in_array($method, $this->classesMap[$className]['methods'] ?? [], true);
+        /** @var TargetData $targetData */
+        $targetData = $this->targetClassMap[$className];
+        return $targetData->getAspectsClosure($method);
     }
 
-    public function shouldUseTrait(string $className): bool
+    private function getProxyPath()
     {
-        return isset($this->classesMap[$className]);
+        return base_path() . config('plugin.luoyue.aop.app.proxy_path', '/runtime/aopCache/proxyClasses') . DIRECTORY_SEPARATOR;
     }
 
-    public function getClassMap(): array
-    {
-        return $this->classesMap;
-    }
 }

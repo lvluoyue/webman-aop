@@ -9,3 +9,4 @@ interface ProxyInterface
 {
     public function process(ProceedingJoinPointInterface $entryClass): mixed;
 }
+ 

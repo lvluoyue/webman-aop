@@ -13,8 +13,6 @@ class PipeLine
 {
     private array $pipes;
 
-    private string $method = 'process';
-
     public function __construct(array $pipes)
     {
         $this->pipes = array_reverse($pipes);
@@ -44,14 +42,11 @@ class PipeLine
 
     public function callback(): Closure
     {
-        return function ($res, $pipe) {
+        return function (Closure $res, Closure $pipe) {
             return function (ProceedingJoinPointInterface $entryClass) use ($res, $pipe) {
                 $tempPipe = $pipe;
-                if (is_string($pipe) && class_exists($pipe)) {
-                    $tempPipe = Container::get($pipe);
-                }
                 $entryClass->pipe = $res;
-                return method_exists($tempPipe, $this->method) ? $tempPipe->{$this->method}($entryClass) : $tempPipe($entryClass);
+                return $tempPipe($entryClass);
             };
         };
     }
