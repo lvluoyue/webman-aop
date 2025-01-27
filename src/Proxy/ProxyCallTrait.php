@@ -2,7 +2,6 @@
 
 namespace luoyue\aop\Proxy;
 
-use luoyue\aop\AopBootstrap;
 use luoyue\aop\Collects\ProxyCollects;
 use luoyue\aop\interfaces\ProceedingJoinPointInterface;
 use support\Container;

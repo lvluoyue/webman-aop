@@ -7,7 +7,7 @@ use luoyue\aop\Proxy\Rewrite;
 use support\Container;
 
 /**
- * Class ProxyCollects.
+ * 代理类收集器
  */
 class ProxyCollects
 {
@@ -18,7 +18,7 @@ class ProxyCollects
         $rewrite = new Rewrite();
         /**
          * @var string $className
-         * @var TargetData $targetClass
+         * @var Pointcut $targetClass
          */
         foreach ($this->targetClassMap as $className => $targetClass) {
             $proxyClass = $targetClass->getProxyClassName(true);
@@ -33,9 +33,9 @@ class ProxyCollects
         }
     }
 
-    public function getTargetData(string $className, string $filePath): TargetData
+    public function getTargetData(string $className, string $filePath): Pointcut
     {
-        return $this->targetClassMap[$className] ??= new TargetData($className, $filePath);
+        return $this->targetClassMap[$className] ??= new Pointcut($className, $filePath);
     }
 
     public function getAspectsClosure(string $className, string $method): array
@@ -43,7 +43,7 @@ class ProxyCollects
         if (!isset($this->targetClassMap[$className])) {
             return [];
         }
-        /** @var TargetData $targetData */
+        /** @var Pointcut $targetData */
         $targetData = $this->targetClassMap[$className];
         return $targetData->getAspectsClosure($method);
     }

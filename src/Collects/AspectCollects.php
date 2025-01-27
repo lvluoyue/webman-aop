@@ -10,15 +10,15 @@ use SplFileInfo;
 use support\Container;
 
 /**
- * Class ProxyClasses.
+ * 切面类收集器
  */
 class AspectCollects
 {
 
-    /** @var AspectData[] $aspectsClass */
+    /** @var JoinPoint[] $aspectsClass */
     private array $aspectsClass = [];
 
-    public function setAspects(AspectData $aspectsClass)
+    public function setAspects(JoinPoint $aspectsClass)
     {
         $this->aspectsClass[] = $aspectsClass;
     }
@@ -42,7 +42,7 @@ class AspectCollects
                 $classNames = AnnotationUtil::getAllClassesInFile($file->getPathname());
                 foreach ($this->getAspectsClasses() as $data) {
                     foreach ($classNames as $className) {
-                        /** @var AspectData $aspect */
+                        /** @var JoinPoint $aspect */
                         [$aspect, $class, $matchesMethod] = array_values($data);
                         if(preg_match("#^{$class}$#", $className)) {
                             $reflectionClass = new ReflectionClass($className);

@@ -7,40 +7,36 @@ use luoyue\aop\Attributes\AfterReturning;
 use luoyue\aop\Attributes\AfterThrowing;
 use luoyue\aop\Attributes\Around;
 use luoyue\aop\Attributes\Before;
-use luoyue\aop\exception\ParseException;
 use luoyue\aop\interfaces\ProceedingJoinPointInterface;
 
-enum AspectTypeEnum
+/**
+ * 通知类型枚举
+ */
+enum AdviceTypeEnum: string
 {
-    case Around;
-    case Before;
-    case After;
-    case AfterReturning;
-    case AfterThrowing;
+    case Around = Around::class;
+    case Before = Before::class;
+    case After = After::class;
+    case AfterReturning = AfterReturning::class;
+    case AfterThrowing = AfterThrowing::class;
 
-    public static function getAspectType(string $class): AspectTypeEnum
-    {
-        return match ($class) {
-            Before::class => AspectTypeEnum::Before,
-            After::class => AspectTypeEnum::After,
-            Around::class => AspectTypeEnum::Around,
-            AfterReturning::class => AspectTypeEnum::AfterReturning,
-            AfterThrowing::class => AspectTypeEnum::AfterThrowing,
-            default => throw new ParseException('unknown aspect type')
-        };
-    }
-
+    /**
+     * 获取通知逻辑闭包
+     * @param object $class
+     * @param string $method
+     * @return \Closure
+     */
     public function getAspectClosure(object $class, string $method): \Closure
     {
         return match ($this) {
-            AspectTypeEnum::Around => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
+            AdviceTypeEnum::Around => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
                 return $class->{$method}($entryClass);
             },
-            AspectTypeEnum::Before => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
+            AdviceTypeEnum::Before => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
                 $class->{$method}();
                 return $entryClass->process();
             },
-            AspectTypeEnum::After => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
+            AdviceTypeEnum::After => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
                 try {
                     $result = $entryClass->process();
                 } finally {

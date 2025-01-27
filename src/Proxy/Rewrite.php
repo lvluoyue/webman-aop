@@ -2,7 +2,7 @@
 
 namespace luoyue\aop\Proxy;
 
-use luoyue\aop\Collects\TargetData;
+use luoyue\aop\Collects\Pointcut;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
@@ -24,7 +24,7 @@ class Rewrite
         $this->prettyPrinter = new Standard();
     }
 
-    public function rewrite(string $className, TargetData $item)
+    public function rewrite(string $className, Pointcut $item)
     {
         $traverser = new NodeTraverser();
         $code = file_get_contents($item->getClassFile());

@@ -2,10 +2,13 @@
 
 namespace luoyue\aop\Collects;
 
-use luoyue\aop\enum\AspectTypeEnum;
+use luoyue\aop\enum\AdviceTypeEnum;
 use support\Container;
 
-class AspectData
+/**
+ * 连接点数据类
+ */
+class JoinPoint
 {
     /** @var string $aspectClass 切面类 */
     private string $aspectClass;
@@ -13,16 +16,16 @@ class AspectData
     /** @var string $aspectMethod 切面方法 */
     private string $aspectMethod;
 
-    /** @var AspectTypeEnum $aspectType 切面类型 */
-    private AspectTypeEnum $aspectType;
+    /** @var AdviceTypeEnum $aspectType 切面类型 */
+    private AdviceTypeEnum $aspectType;
 
     /** @var array $aspectClasses 切面表达式 */
     private array $aspectClasses;
 
-    /** @var TargetData[] $targetData 表达式匹配的目标类 */
+    /** @var Pointcut[] $targetData 表达式匹配的目标类 */
     private array $targetData = [];
 
-    public function __construct(string $aspectClass, string $aspectMethod, AspectTypeEnum $aspectType, array $aspectClasses)
+    public function __construct(string $aspectClass, string $aspectMethod, AdviceTypeEnum $aspectType, array $aspectClasses)
     {
         $this->aspectClass = $aspectClass;
         $this->aspectMethod = $aspectMethod;
@@ -55,7 +58,7 @@ class AspectData
         return $this->aspectClasses;
     }
 
-    public function addTargetData(TargetData $targetData)
+    public function addTargetData(Pointcut $targetData)
     {
         $this->targetData[] = $targetData;
     }

@@ -2,7 +2,10 @@
 
 namespace luoyue\aop\Collects;
 
-class TargetData
+/**
+ * 切入点数据类
+ */
+class Pointcut
 {
     private string $targetClass;
     private string $classFile;
@@ -39,7 +42,7 @@ class TargetData
         return $namespaceName . $proxyClassName . '_' . crc32($proxyClassName);
     }
 
-    public function addTargetClass(string $method, AspectData $targetMethod)
+    public function addTargetClass(string $method, JoinPoint $targetMethod)
     {
         $this->targetMethod[$method][] = $targetMethod;
     }
@@ -56,6 +59,6 @@ class TargetData
     public function getAspectsClosure(string $method): array
     {
         $aspects = $this->targetMethod[$method] ?? [];
-        return array_map(fn (AspectData $item) => $item->getAspectClosure(), $aspects);
+        return array_map(fn (JoinPoint $item) => $item->getAspectClosure(), $aspects);
     }
 }

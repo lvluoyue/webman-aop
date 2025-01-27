@@ -2,21 +2,14 @@
 
 namespace luoyue\aop\Attributes;
 
-use LinFly\Annotation\AbstractAnnotationAttribute;
-use luoyue\aop\Attributes\parser\AspectParser;
-
 #[\Attribute(\Attribute::TARGET_METHOD)]
-class AfterThrowing extends AbstractAnnotationAttribute
+class AfterThrowing
 {
-
-    public function __construct(array|string $classes)
+    /**
+     * 抛出异常通知
+     * @param array|string $pointcut 切入点表达式
+     */
+    public function __construct(array|string $pointcut)
     {
-        $this->setArguments(func_get_args());
     }
-
-    public static function getParser(): array|string
-    {
-        return AspectParser::class;
-    }
-
 }

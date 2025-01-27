@@ -4,7 +4,6 @@ namespace luoyue\aop\Proxy;
 
 use Closure;
 use luoyue\aop\interfaces\ProceedingJoinPointInterface;
-use support\Container;
 
 /**
  * Class PipeLine.

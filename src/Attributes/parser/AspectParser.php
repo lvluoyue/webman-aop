@@ -4,21 +4,41 @@ namespace luoyue\aop\Attributes\parser;
 
 use LinFly\Annotation\Contracts\IAnnotationParser;
 use luoyue\aop\Collects\AspectCollects;
-use luoyue\aop\Collects\AspectData;
-use luoyue\aop\enum\AspectTypeEnum;
+use luoyue\aop\Collects\JoinPoint;
+use luoyue\aop\enum\AdviceTypeEnum;
+use ReflectionAttribute;
+use ReflectionClass;
 use support\Container;
 
+/**
+ * 切面类注解处理
+ */
 class AspectParser implements IAnnotationParser
 {
 
     public static function process(array $item): void
     {
-        $aspectType = AspectTypeEnum::getAspectType($item['annotation']);
-        $matches = array_map(fn ($class) => self::getMatchesClasses($class), (array) $item['parameters']['classes']);
-        $aspectCollects = Container::get(AspectCollects::class);
-        $aspectCollects->setAspects(new AspectData($item['class'], $item['method'], $aspectType, $matches));
+        $reflectionClass = new ReflectionClass($item['class']);
+        foreach ($reflectionClass->getMethods() as $method) {
+            foreach (AdviceTypeEnum::cases() as $aspectType) {
+                /** @var ?ReflectionAttribute $annotation */
+                $annotation = current($method->getAttributes($aspectType->value));
+                if ($annotation) {
+                    $parameters = (array)$annotation->getArguments()[0];
+                    $aspectType = AdviceTypeEnum::tryFrom($annotation->getName());
+                    $matches = array_map(fn ($class) => self::getMatchesClasses($class), $parameters);
+                    $aspectCollects = Container::get(AspectCollects::class);
+                    $aspectCollects->setAspects(new JoinPoint($item['class'], $method->getName(), $aspectType, $matches));
+                }
+            }
+        }
     }
 
+    /**
+     * 将切入点表达式解析为正则表达式
+     * @param string $class
+     * @return array
+     */
     private static function getMatchesClasses(string $class): array
     {
         $explode = explode('::', $class, 2);
