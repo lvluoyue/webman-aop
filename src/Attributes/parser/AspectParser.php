@@ -44,7 +44,7 @@ class AspectParser implements IAnnotationParser
         $explode = explode('::', $class, 2);
         $explode[1] ??= '*';
         return [
-            'class' => str_replace(['*', '\\'], ['.*', '\\\\'], $explode[0]),
+            'class' => str_replace(['\\', '**', '*', '#'], ['\\\\', '.#', '[^\\\\]#', '*'], $explode[0]),
             'method' => str_replace(['*', '\\'], ['.*', '\\\\'], $explode[1])
         ];
     }

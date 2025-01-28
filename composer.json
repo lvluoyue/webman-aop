@@ -10,7 +10,8 @@
   },
   "require-dev": {
     "workerman/webman-framework": "^1.6",
-    "php-di/php-di": "^7.0"
+    "php-di/php-di": "^7.0",
+    "phpunit/phpunit": "^11.5"
   },
   "license": "MIT",
   "autoload": {

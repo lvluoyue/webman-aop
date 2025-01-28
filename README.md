@@ -30,7 +30,7 @@ composer require luoyue/webman-aop
 
 ## 使用方法（php-di环境）
 首先创建切入点
-```
+```php
 <?php
 namespace app\service\impl;
 
@@ -45,7 +45,7 @@ class UserServiceImpl
 
 创建controller
 
-```
+```php
 <?php
 
 namespace app\controller;
@@ -103,7 +103,7 @@ around after
 
 在 functions.php 定义如下函数:
 
-```
+```php
 /**
  *  加载容器的对象
  */
@@ -117,7 +117,7 @@ if (! function_exists('load')) {
 
 在controller添加如下代码：
 
-```
+```php
 
     public function index()
     {
@@ -133,9 +133,12 @@ if (! function_exists('load')) {
 暂不支持自定义切入顺序
 
 ## 切入点表达式
+> **类名表达式**：** (匹配多个\分割的命名空间)，* （匹配一个类名或命名空间）<br>
+> **方法名表达式**：* （匹配一个方法名）
+
 目前支持的表达式有：
-- **匹配一个方法**：`类名::方法名`
-- **匹配所有方法**：`类名::*` 或 `类名`
+- **匹配一个方法**：`app\service\impl\UserServiceImpl::info`
+- **匹配所有方法**：`app\service\impl\UserServiceImpl::*` 或 `app\service\impl\UserServiceImpl`
 - **匹配service类的info**：`app\service\*::info`
 - **匹配service类的所有方法**：`app\service\*::*`
 - **匹配所有类的info**：`*::info` （目前有bug）
