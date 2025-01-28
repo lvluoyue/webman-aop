@@ -14,10 +14,19 @@ use luoyue\aop\interfaces\ProceedingJoinPointInterface;
  */
 enum AdviceTypeEnum: string
 {
+    /** 环绕通知（Around） */
     case Around = Around::class;
+
+    /** 前置通知（Before） */
     case Before = Before::class;
+
+    /** 后置通知（After） */
     case After = After::class;
+
+    /** 返回通知（After Returning） */
     case AfterReturning = AfterReturning::class;
+
+    /** 异常通知（After Throwing） */
     case AfterThrowing = AfterThrowing::class;
 
     /**
@@ -26,7 +35,7 @@ enum AdviceTypeEnum: string
      * @param string $method
      * @return \Closure
      */
-    public function getAspectClosure(object $class, string $method): \Closure
+    public function getAdviceClosure(object $class, string $method): \Closure
     {
         return match ($this) {
             AdviceTypeEnum::Around => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {

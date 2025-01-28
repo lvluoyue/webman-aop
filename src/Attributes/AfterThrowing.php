@@ -6,10 +6,13 @@ namespace luoyue\aop\Attributes;
 class AfterThrowing
 {
     /**
-     * 抛出异常通知
+     * 异常通知（After Throwing）
      * @param array|string $pointcut 切入点表达式
      */
     public function __construct(array|string $pointcut)
     {
+        if (empty($pointcut)) {
+            throw new \InvalidArgumentException('pointcut is empty');
+        }
     }
 }

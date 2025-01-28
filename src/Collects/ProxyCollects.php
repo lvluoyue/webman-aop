@@ -45,7 +45,7 @@ class ProxyCollects
         }
         /** @var Pointcut $targetData */
         $targetData = $this->targetClassMap[$className];
-        return $targetData->getAspectsClosure($method);
+        return $targetData->getAdviceClosure($method);
     }
 
     private function getProxyPath()

@@ -2,8 +2,8 @@
 
 return [
     'enable' => true,
-    'proxyPath' => '/runtime/aopCache/proxyClasses',
-    // 切入对象的扫描路径
+    'proxyPath' => '/runtime/cache/aop',
+    // 切入点扫描路径，不建议扫描vendor目录
     'scans' => [
         'app',
     ],

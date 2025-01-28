@@ -43,9 +43,9 @@ class JoinPoint
         return $this->aspectMethod;
     }
 
-    public function getAspectClosure(): \Closure
+    public function getAdviceClosure(): \Closure
     {
-        return $this->aspectType->getAspectClosure(Container::get($this->aspectClass), $this->aspectMethod);
+        return $this->aspectType->getAdviceClosure(Container::get($this->aspectClass), $this->aspectMethod);
     }
 
     public function getTargetData(): array

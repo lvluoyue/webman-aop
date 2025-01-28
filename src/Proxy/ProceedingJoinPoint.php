@@ -30,8 +30,8 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
     public function process(): mixed
     {
         $c = $this->pipe;
-        if (! $this->pipe instanceof Closure) {
-            throw new ProceedingJoinPointException('entry class pipe must be closure');
+        if (!$this->pipe) {
+            throw new ProceedingJoinPointException('The pipe is empty');
         }
         return $c($this);
     }

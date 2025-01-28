@@ -6,10 +6,13 @@ namespace luoyue\aop\Attributes;
 class AfterReturning
 {
     /**
-     * 返回后通知
+     * 返回通知（After Returning）
      * @param array|string $pointcut 切入点表达式
      */
     public function __construct(array|string $pointcut)
     {
+        if (empty($pointcut)) {
+            throw new \InvalidArgumentException('pointcut is empty');
+        }
     }
 }

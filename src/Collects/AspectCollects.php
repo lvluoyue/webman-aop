@@ -65,7 +65,7 @@ class AspectCollects
     }
 
     /**
-     * 获取所有class表达式
+     * 获取所有切入点表达式
      * @return Generator
      */
     private function getAspectsClasses(): Generator

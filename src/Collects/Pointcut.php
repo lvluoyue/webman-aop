@@ -27,6 +27,7 @@ class Pointcut
     {
         return $this->proxyFile ??= str_replace('\\', '_', $this->targetClass) . '.proxy.php';
     }
+
     public function getProxyClassName(bool $namespace = false)
     {
         $proxyClassName = $this->targetClass;
@@ -56,9 +57,9 @@ class Pointcut
      * @param string $method 方法名
      * @return \Closure[] 切面闭包集合
      */
-    public function getAspectsClosure(string $method): array
+    public function getAdviceClosure(string $method): array
     {
         $aspects = $this->targetMethod[$method] ?? [];
-        return array_map(fn (JoinPoint $item) => $item->getAspectClosure(), $aspects);
+        return array_map(fn (JoinPoint $item) => $item->getAdviceClosure(), $aspects);
     }
 }
