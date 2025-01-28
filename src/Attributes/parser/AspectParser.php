@@ -4,7 +4,7 @@ namespace luoyue\aop\Attributes\parser;
 
 use LinFly\Annotation\Contracts\IAnnotationParser;
 use luoyue\aop\Collects\AspectCollects;
-use luoyue\aop\Collects\JoinPoint;
+use luoyue\aop\Collects\node\AspectNode;
 use luoyue\aop\enum\AdviceTypeEnum;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -28,7 +28,7 @@ class AspectParser implements IAnnotationParser
                     $aspectType = AdviceTypeEnum::tryFrom($annotation->getName());
                     $matches = array_map(fn ($class) => self::getMatchesClasses($class), $parameters);
                     $aspectCollects = Container::get(AspectCollects::class);
-                    $aspectCollects->setAspects(new JoinPoint($item['class'], $method->getName(), $aspectType, $matches));
+                    $aspectCollects->setAspects(new AspectNode($item['class'], $method->getName(), $aspectType, $matches));
                 }
             }
         }

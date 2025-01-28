@@ -9,13 +9,52 @@ class attributesTest extends TestCase
 {
 
     #[Test]
+    #[DataProvider('annotationData')]
+    public function annotationTest(string $class, $throws): void
+    {
+        $throws && $this->expectException($throws);
+        new $class('');
+        $this->assertTrue(true);
+    }
+
+    public static function annotationData()
+    {
+        return [
+            'After' => [
+                'class' => \luoyue\aop\Attributes\After::class,
+                'throws' => \InvalidArgumentException::class,
+            ],
+            'AfterReturning' => [
+                'class' => \luoyue\aop\Attributes\AfterReturning::class,
+                'throws' => \InvalidArgumentException::class,
+            ],
+            'AfterThrowing' => [
+                'class' => \luoyue\aop\Attributes\AfterThrowing::class,
+                'throws' => \InvalidArgumentException::class,
+            ],
+            'Before' => [
+                'class' => \luoyue\aop\Attributes\Before::class,
+                'throws' => \InvalidArgumentException::class,
+            ],
+            'Around' => [
+                'class' => \luoyue\aop\Attributes\Around::class,
+                'throws' => \InvalidArgumentException::class,
+            ],
+            'Aspect' => [
+                'class' => \luoyue\aop\Attributes\Aspect::class,
+                'throws' => '',
+            ],
+        ];
+    }
+
+    #[Test]
     #[DataProvider('classesData')]
-    public function matchesClassesTest(string $classes, $resultClass, $resultMethod)
+    public function matchesClassesTest(string $classes, string $resultClass, string $resultMethod): void
     {
         $reflectionMethod = new ReflectionMethod(AspectParser::class, 'getMatchesClasses');
-        $result = $reflectionMethod->invoke(null, $classes);
-        $this->assertEquals($resultClass, $result['class']);
-        $this->assertEquals($resultMethod, $result['method']);
+        [$class, $method] = array_values($reflectionMethod->invoke(null, $classes));
+        $this->assertEquals($resultClass, $class, '类名不匹配');
+        $this->assertEquals($resultMethod, $method, '方法名不匹配');
     }
 
     public static function classesData(): array

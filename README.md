@@ -136,10 +136,16 @@ if (! function_exists('load')) {
 > **类名表达式**：** (匹配多个\分割的命名空间)，* （匹配一个类名或命名空间）<br>
 > **方法名表达式**：* （匹配一个方法名）
 
-目前支持的表达式有：
+示例：
 - **匹配一个方法**：`app\service\impl\UserServiceImpl::info`
 - **匹配所有方法**：`app\service\impl\UserServiceImpl::*` 或 `app\service\impl\UserServiceImpl`
-- **匹配service类的info**：`app\service\*::info`
-- **匹配service类的所有方法**：`app\service\*::*`
-- **匹配所有类的info**：`*::info` （目前有bug）
-- **匹配所有类的所有方法**：`*::*` （目前有bug）
+- **匹配impl目录下的info**：`app\service\impl\*::info`
+- **匹配service目录下的所有类**：`app\service\**`
+- **匹配所有类的info**：`**::info` （目前有bug）
+- **匹配所有类的所有方法**：`**::*` （目前有bug）
+
+## TODO
+- [x] 切入点表达式支持通配符
+- [x] 切入点表达式支持多个\分割的命名空间
+- [ ] 新增切面排序
+- [ ] 优化启动速度

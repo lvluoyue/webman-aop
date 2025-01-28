@@ -2,9 +2,10 @@
 
 namespace luoyue\aop\Collects;
 
+use Generator;
 use LinFly\Annotation\Util\AnnotationUtil;
 use luoyue\aop\AopBootstrap;
-use Generator;
+use luoyue\aop\Collects\node\AspectNode;
 use ReflectionClass;
 use SplFileInfo;
 use support\Container;
@@ -15,10 +16,10 @@ use support\Container;
 class AspectCollects
 {
 
-    /** @var JoinPoint[] $aspectsClass */
+    /** @var AspectNode[] $aspectsClass */
     private array $aspectsClass = [];
 
-    public function setAspects(JoinPoint $aspectsClass)
+    public function setAspects(AspectNode $aspectsClass)
     {
         $this->aspectsClass[] = $aspectsClass;
     }
@@ -42,7 +43,7 @@ class AspectCollects
                 $classNames = AnnotationUtil::getAllClassesInFile($file->getPathname());
                 foreach ($this->getAspectsClasses() as $data) {
                     foreach ($classNames as $className) {
-                        /** @var JoinPoint $aspect */
+                        /** @var AspectNode $aspect */
                         [$aspect, $class, $matchesMethod] = array_values($data);
                         if(preg_match("#^{$class}$#", $className)) {
                             $reflectionClass = new ReflectionClass($className);
@@ -53,10 +54,10 @@ class AspectCollects
                             $targetData = $proxyCollects->getTargetData($className, $filePath);
                             foreach ($reflectionClass->getMethods() as $method) {
                                 if(preg_match("#^{$matchesMethod}$#", $method->getName())) {
-                                    $targetData->addTargetClass($method->getName(), $aspect);
+                                    $targetData->addPointcutMethod($method->getName(), $aspect);
                                 }
                             }
-                            $aspect->addTargetData($targetData);
+                            $aspect->addMatchesPointcut($targetData);
                         }
                     }
                 }
@@ -71,7 +72,7 @@ class AspectCollects
     private function getAspectsClasses(): Generator
     {
         foreach ($this->aspectsClass as $aspectsClass) {
-            foreach ($aspectsClass->getAspectClasses() as $class) {
+            foreach ($aspectsClass->getPointcut() as $class) {
                 yield [
                     'aspect' => $aspectsClass,
                     ...$class,

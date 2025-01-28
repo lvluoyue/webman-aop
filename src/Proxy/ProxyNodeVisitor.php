@@ -3,7 +3,7 @@
 namespace luoyue\aop\Proxy;
 
 use luoyue\aop\AopBootstrap;
-use luoyue\aop\Collects\Pointcut;
+use luoyue\aop\Collects\node\PointcutNode;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
@@ -44,7 +44,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
 
     private $extends = null;
 
-    public function __construct(private Pointcut $proxyCollects)
+    public function __construct(private PointcutNode $proxyCollects)
     {
     }
 

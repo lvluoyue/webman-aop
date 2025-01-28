@@ -3,6 +3,7 @@
 namespace luoyue\aop\Collects;
 
 use luoyue\aop\AopBootstrap;
+use luoyue\aop\Collects\node\PointcutNode;
 use luoyue\aop\Proxy\Rewrite;
 use support\Container;
 
@@ -18,7 +19,7 @@ class ProxyCollects
         $rewrite = new Rewrite();
         /**
          * @var string $className
-         * @var Pointcut $targetClass
+         * @var PointcutNode $targetClass
          */
         foreach ($this->targetClassMap as $className => $targetClass) {
             $proxyClass = $targetClass->getProxyClassName(true);
@@ -33,9 +34,9 @@ class ProxyCollects
         }
     }
 
-    public function getTargetData(string $className, string $filePath): Pointcut
+    public function getTargetData(string $className, string $filePath): PointcutNode
     {
-        return $this->targetClassMap[$className] ??= new Pointcut($className, $filePath);
+        return $this->targetClassMap[$className] ??= new PointcutNode($className, $filePath);
     }
 
     public function getAspectsClosure(string $className, string $method): array
@@ -43,7 +44,7 @@ class ProxyCollects
         if (!isset($this->targetClassMap[$className])) {
             return [];
         }
-        /** @var Pointcut $targetData */
+        /** @var PointcutNode $targetData */
         $targetData = $this->targetClassMap[$className];
         return $targetData->getAdviceClosure($method);
     }
