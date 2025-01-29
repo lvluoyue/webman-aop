@@ -13,12 +13,13 @@ class Aspect
 
     private static Aspect $instance;
 
-    private queue $queue;
+    private PriorityQueue $queue;
+
     private AspectCollects $aspectCollects;
 
     private function __construct()
     {
-        $this->queue = new queue();
+        $this->queue = new PriorityQueue();
         $this->aspectCollects = new AspectCollects();
     }
 
