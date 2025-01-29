@@ -28,11 +28,7 @@ class AopBootstrap implements Bootstrap
             $time = microtime(true);
         }
 
-        /** @var AspectCollects $aspectCollects */
-        $aspectCollects = Container::get(AspectCollects::class);
-        foreach ($config['scans'] as $scan) {
-            $aspectCollects->scan($scan);
-        }
+        Aspect::getInstance()->scan($config);
 
         /** @var ProxyCollects $proxyCollects */
         $proxyCollects = Container::get(ProxyCollects::class);

@@ -11,6 +11,12 @@ use luoyue\aop\Attributes\parser\AspectParser;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Aspect extends AbstractAnnotationAttribute
 {
+
+    public function __construct(?int $priority = null)
+    {
+        $this->setArguments(func_get_args());
+    }
+
     public static function getParser(): array|string
     {
         return AspectParser::class;

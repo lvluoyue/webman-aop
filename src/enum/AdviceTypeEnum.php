@@ -38,9 +38,9 @@ enum AdviceTypeEnum: string
         return match ($this) {
             AdviceTypeEnum::Around => 1,
             AdviceTypeEnum::Before => 2,
-            AdviceTypeEnum::After => 3,
-            AdviceTypeEnum::AfterReturning => 4,
-            AdviceTypeEnum::AfterThrowing => 5,
+            AdviceTypeEnum::After => 2,
+            AdviceTypeEnum::AfterReturning => 3,
+            AdviceTypeEnum::AfterThrowing => 3,
         };
     }
 

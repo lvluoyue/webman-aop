@@ -145,8 +145,9 @@ if (! function_exists('load')) {
 - **匹配所有类的所有方法**：`**::*` （目前有bug）
 
 ## TODO
+- [x] 新增After、AfterReturning、AfterThrowing、Before注解
 - [x] 切入点表达式支持通配符
 - [x] 切入点表达式支持多个\分割的命名空间
-- [ ] 新增切面排序
+- [x] 新增切面排序
 - [ ] 新增注解切面
 - [ ] 优化启动速度

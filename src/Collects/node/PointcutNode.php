@@ -3,7 +3,7 @@
 namespace luoyue\aop\Collects\node;
 
 use luoyue\aop\AopBootstrap;
-use luoyue\aop\Proxy\AspectManager;
+use luoyue\aop\Collects\AspectManager;
 use SplPriorityQueue;
 
 /**

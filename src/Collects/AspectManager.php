@@ -1,6 +1,6 @@
 <?php
 
-namespace luoyue\aop\Proxy;
+namespace luoyue\aop\Collects;
 
 class AspectManager
 {
