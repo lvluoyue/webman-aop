@@ -11,13 +11,18 @@ use support\Container;
  */
 trait ProxyCallTrait
 {
-    public static function _proxyCall(string $className, string $classMethod, array $arguments, \Closure $closure): mixed
+    protected static function _proxyCall(string $className, string $classMethod, array $arguments, \Closure $closure): mixed
     {
-        $entryClass = new ProceedingJoinPoint($className, $classMethod, $arguments, $closure);
+        $entryClass = new ProceedingJoinPoint(...func_get_args());
+        $pipeLine = new PipeLine(self::_getClosure($className, $classMethod));
+        return $pipeLine->run($entryClass);
+    }
+
+    protected static function _getClosure(string $className, string $classMethod): array
+    {
         /** @var ProxyCollects $proxyCollects */
         $proxyCollects = Container::get(ProxyCollects::class);
-        $pipeLine = new PipeLine($proxyCollects->getAspectsClosure($className, $classMethod));
-        return $pipeLine->run($entryClass, fn (ProceedingJoinPointInterface $entry) => $entry->processOriginalMethod());
+        return $proxyCollects->getAspectsClosure($className, $classMethod);
     }
 
 }

@@ -14,32 +14,34 @@ class PipeLine
 
     public function __construct(array $pipes)
     {
-        $this->pipes = array_reverse($pipes);
+        $this->pipes = $pipes;
     }
 
     /**
+     * 运行管道
      * @param ProceedingJoinPointInterface $entry
-     * @param Closure $cFun
      * @return mixed
      */
-    public function run(ProceedingJoinPointInterface $entry, Closure $cFun): mixed
+    public function run(ProceedingJoinPointInterface $entry): mixed
     {
-        $pipe = array_reduce($this->pipes, $this->callback(), $this->default($cFun));
+        $pipe = array_reduce($this->pipes, $this->callback(), $this->default());
         return $pipe($entry);
     }
 
     /**
-     * @param Closure $cFun
+     * 默认管道（调用原始方法）
      * @return Closure
      */
-    public function default(Closure $cFun): Closure
+    private function default(): Closure
     {
-        return function (ProceedingJoinPointInterface $entry) use ($cFun) {
-            return $cFun($entry);
-        };
+        return fn (ProceedingJoinPointInterface $entry) => $entry->processOriginalMethod();
     }
 
-    public function callback(): Closure
+    /**
+     * 管道回调
+     * @return Closure
+     */
+    private function callback(): Closure
     {
         return function (Closure $res, Closure $pipe) {
             return function (ProceedingJoinPointInterface $entryClass) use ($res, $pipe) {

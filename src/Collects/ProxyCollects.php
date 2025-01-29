@@ -12,20 +12,17 @@ use support\Container;
  */
 class ProxyCollects
 {
-    private array $targetClassMap = [];
+    /** @var array<string, PointcutNode> $PointcutMap 切入点集合 */
+    private array $PointcutMap = [];
 
     public function scan()
     {
         $rewrite = new Rewrite();
-        /**
-         * @var string $className
-         * @var PointcutNode $targetClass
-         */
-        foreach ($this->targetClassMap as $className => $targetClass) {
-            $proxyClass = $targetClass->getProxyClassName(true);
-            $proxyFile = $rewrite->rewrite($className, $targetClass);
+        foreach ($this->PointcutMap as $className => $pointcutNode) {
+            $proxyClass = $pointcutNode->getProxyClassName(true);
+            $rewrite->rewrite($pointcutNode);
             $container = Container::instance();
-            AopBootstrap::getComposerClassLoader()->addClassMap([$proxyClass => $proxyFile]);
+            AopBootstrap::getComposerClassLoader()->addClassMap([$proxyClass => $pointcutNode->getProxyFile(true)]);
             if ($container instanceof \Webman\Container) {
                 Container::make($className, Container::get($proxyClass));
             } else if ($container instanceof \DI\Container) {
@@ -34,24 +31,29 @@ class ProxyCollects
         }
     }
 
-    public function getTargetData(string $className, string $filePath): PointcutNode
+    /**
+     * 获取切入点节点
+     * @param string $className
+     * @return PointcutNode
+     */
+    public function getPointcutNode(string $className): PointcutNode
     {
-        return $this->targetClassMap[$className] ??= new PointcutNode($className, $filePath);
+        return $this->PointcutMap[$className] ??= new PointcutNode($className);
     }
 
+    /**
+     * 获取切面闭包集合
+     * @param string $className
+     * @param string $method
+     * @return array
+     */
     public function getAspectsClosure(string $className, string $method): array
     {
-        if (!isset($this->targetClassMap[$className])) {
+        if (!isset($this->PointcutMap[$className])) {
             return [];
         }
-        /** @var PointcutNode $targetData */
-        $targetData = $this->targetClassMap[$className];
+        $targetData = $this->PointcutMap[$className];
         return $targetData->getAdviceClosure($method);
-    }
-
-    private function getProxyPath()
-    {
-        return base_path() . config('plugin.luoyue.aop.app.proxy_path', '/runtime/aopCache/proxyClasses') . DIRECTORY_SEPARATOR;
     }
 
 }

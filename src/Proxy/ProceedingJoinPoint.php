@@ -20,6 +20,14 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
     /** @var ReflectionMethod[] */
     private static array $reflectMethods;
 
+    /**
+     * 构造一个新的方法拦截器实例
+     *
+     * @param string $className 类名，表示需要拦截的类
+     * @param string $methodName 方法名，表示需要拦截的方法
+     * @param array $arguments 方法参数，包含该方法的所有参数
+     * @param Closure $originalMethod 原始方法的闭包，允许在拦截后仍然可以调用原始方法
+     */
     public function __construct(public string $className,
                                 public string $methodName,
                                 public array $arguments,

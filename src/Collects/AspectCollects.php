@@ -16,10 +16,10 @@ use support\Container;
 class AspectCollects
 {
 
-    /** @var AspectNode[] $aspectsClass */
+    /** @var AspectNode[] $aspectsClass 切面集合 */
     private array $aspectsClass = [];
 
-    public function setAspects(AspectNode $aspectsClass)
+    public function addAspects(AspectNode $aspectsClass)
     {
         $this->aspectsClass[] = $aspectsClass;
     }
@@ -38,26 +38,28 @@ class AspectCollects
         /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
             if ($file->isFile() && $file->getExtension() == 'php') {
-                // 根据文件路径获取类名
-//                $className = str_replace(['./', '../', '/'], ['', '', '\\'], substr($file->getPathname(), 0, -4));
+                //扫描文件中的类名集合
                 $classNames = AnnotationUtil::getAllClassesInFile($file->getPathname());
+                //遍历切入点
                 foreach ($this->getAspectsClasses() as $data) {
+                    //遍历文件类名
                     foreach ($classNames as $className) {
                         /** @var AspectNode $aspect */
                         [$aspect, $class, $matchesMethod] = array_values($data);
+                        //匹配切入点
                         if(preg_match("#^{$class}$#", $className)) {
                             $reflectionClass = new ReflectionClass($className);
-                            if($reflectionClass->isInterface() || $reflectionClass->isEnum()) {
+                            if($reflectionClass->isInterface() || $reflectionClass->isEnum()) {//判断是否是class
                                 continue;
                             }
-                            $filePath = AopBootstrap::getComposerClassLoader()->findFile($className);
-                            $targetData = $proxyCollects->getTargetData($className, $filePath);
+                            $pointcutNode = $proxyCollects->getPointcutNode($className);
                             foreach ($reflectionClass->getMethods() as $method) {
                                 if(preg_match("#^{$matchesMethod}$#", $method->getName())) {
-                                    $targetData->addPointcutMethod($method->getName(), $aspect);
+                                    $pointcutNode->addPointcutMethod($method->getName(), $aspect);
                                 }
                             }
-                            $aspect->addMatchesPointcut($targetData);
+                            //将切入节点添加到切面节点
+                            $aspect->addMatchesPointcut($pointcutNode);
                         }
                     }
                 }
@@ -66,7 +68,7 @@ class AspectCollects
     }
 
     /**
-     * 获取所有切入点表达式
+     * 遍历所有切入点表达式
      * @return Generator
      */
     private function getAspectsClasses(): Generator

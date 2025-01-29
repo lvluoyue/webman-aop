@@ -28,7 +28,7 @@ class AspectParser implements IAnnotationParser
                     $aspectType = AdviceTypeEnum::tryFrom($annotation->getName());
                     $matches = array_map(fn ($class) => self::getMatchesClasses($class), $parameters);
                     $aspectCollects = Container::get(AspectCollects::class);
-                    $aspectCollects->setAspects(new AspectNode($item['class'], $method->getName(), $aspectType, $matches));
+                    $aspectCollects->addAspects(new AspectNode($item['class'], $method->getName(), $aspectType, $matches));
                 }
             }
         }

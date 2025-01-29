@@ -48,6 +48,15 @@ class AspectNode
     }
 
     /**
+     * 获取切面优先级
+     * @return int
+     */
+    public function getPriority(): int
+    {
+        return $this->adviceType->getPriority();
+    }
+
+    /**
      * 获取通知闭包
      * @return \Closure
      */

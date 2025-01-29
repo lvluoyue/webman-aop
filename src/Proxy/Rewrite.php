@@ -24,33 +24,22 @@ class Rewrite
         $this->prettyPrinter = new Standard();
     }
 
-    public function rewrite(string $className, PointcutNode $item)
+    /**
+     * 重写代理类
+     * @param PointcutNode $item
+     * @return void
+     */
+    public function rewrite(PointcutNode $item): void
     {
         $traverser = new NodeTraverser();
+        //获取原始代码
         $code = file_get_contents($item->getClassFile());
         $ast = $this->parser->parse($code);
         $traverser->addVisitor(new ProxyNodeVisitor($item));
         $newAst = $traverser->traverse($ast);
         $newCode = $this->prettyPrinter->prettyPrintFile($newAst);
-        $proxyFile = $this->getProxyPath() . $item->getProxyFile();
+        $proxyFile = $item->getProxyFile(true);
         file_put_contents($proxyFile, $newCode);
-        return $proxyFile;
     }
 
-    private function getProxyPath()
-    {
-        $path = base_path() . config('plugin.luoyue.aop.app.proxy_path', '/runtime/aopCache/proxyClasses') . DIRECTORY_SEPARATOR;
-        if (!is_dir($path)) {
-            mkdir($path, 0777, true);
-        }
-        return $path;
-    }
-
-    /**
-     * @param $className
-     */
-    protected function getProxyFilePath($className): string
-    {
-        return $this->config->getPath() . '/' . str_replace('\\', '_', $className) . '.proxy.php';
-    }
 }

@@ -2,6 +2,10 @@
 
 namespace luoyue\aop\Collects\node;
 
+use luoyue\aop\AopBootstrap;
+use luoyue\aop\Proxy\AspectManager;
+use SplPriorityQueue;
+
 /**
  * 切入点节点
  */
@@ -16,13 +20,12 @@ class PointcutNode
     /** @var string $proxyFile 切入点代理文件名 */
     private string $proxyFile;
 
-    /** @var array $pointcutMethod 切入点方法集合 */
+    /** @var array<string, SplPriorityQueue> $pointcutMethod 切入点方法集合 */
     private array $pointcutMethod; // method1 => aspectdata[], method2 => aspectdata[], method3 => aspectdata[]
 
-    public function __construct(string $pointcutClass, string $classFile)
+    public function __construct(string $pointcutClass)
     {
         $this->pointcutClass = $pointcutClass;
-        $this->classFile = $classFile;
     }
 
     /**
@@ -31,16 +34,17 @@ class PointcutNode
      */
     public function getClassFile(): string
     {
-        return $this->classFile;
+        return $this->classFile ??= AopBootstrap::getComposerClassLoader()->findFile($this->pointcutClass);
     }
 
     /**
      * 获取切入点代理文件名
      * @return string
      */
-    public function getProxyFile(): string
+    public function getProxyFile(bool $path = false): string
     {
-        return $this->proxyFile ??= str_replace('\\', '_', $this->pointcutClass) . '.proxy.php';
+        $this->proxyFile ??= str_replace('\\', '_', $this->pointcutClass) . '.proxy.php';
+        return $path ? $this->getProxyPath() . DIRECTORY_SEPARATOR . $this->proxyFile : $this->proxyFile;
     }
 
     public function getProxyClassName(bool $namespace = false): string
@@ -66,7 +70,8 @@ class PointcutNode
      */
     public function addPointcutMethod(string $method, AspectNode $aspectNode): void
     {
-        $this->pointcutMethod[$method][] = $aspectNode;
+        $this->pointcutMethod[$method] ??= new SplPriorityQueue();
+        $this->pointcutMethod[$method]->insert($aspectNode, $aspectNode->getPriority());
     }
 
     /**
@@ -86,7 +91,33 @@ class PointcutNode
      */
     public function getAdviceClosure(string $methodName): array
     {
-        $aspects = $this->pointcutMethod[$methodName] ?? [];
-        return array_map(fn (AspectNode $item) => $item->getAdviceClosure(), $aspects);
+        if(AspectManager::has($this->pointcutClass, $methodName)) {
+            return AspectManager::get($this->pointcutClass, $methodName);
+        }
+        $aspects = $this->pointcutMethod[$methodName] ?? false;
+        if (!$aspects) {
+            return [];
+        }
+        while ($aspects->valid()) {
+            /** @var AspectNode $aspect */
+            $aspect = $aspects->current();
+            AspectManager::insert($this->pointcutClass, $methodName, $aspect->getAdviceClosure());
+            $aspects->next();
+        }
+        return AspectManager::get($this->pointcutClass, $methodName);
     }
+
+    /**
+     * 获取代理文件路径
+     * @return string
+     */
+    private function getProxyPath()
+    {
+        $path = base_path() . config('plugin.luoyue.aop.app.proxy_path', '/runtime/cache/aop') . DIRECTORY_SEPARATOR;
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+        return $path;
+    }
+
 }

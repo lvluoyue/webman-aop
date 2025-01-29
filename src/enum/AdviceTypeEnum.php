@@ -30,6 +30,21 @@ enum AdviceTypeEnum: string
     case AfterThrowing = AfterThrowing::class;
 
     /**
+     * 获取通知优先级
+     * @return int
+     */
+    public function getPriority(): int
+    {
+        return match ($this) {
+            AdviceTypeEnum::Around => 1,
+            AdviceTypeEnum::Before => 2,
+            AdviceTypeEnum::After => 3,
+            AdviceTypeEnum::AfterReturning => 4,
+            AdviceTypeEnum::AfterThrowing => 5,
+        };
+    }
+
+    /**
      * 获取通知逻辑闭包
      * @param object $class
      * @param string $method
