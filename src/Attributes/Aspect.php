@@ -14,7 +14,6 @@ class Aspect extends AbstractAnnotationAttribute
 
     public function __construct(?int $priority = null)
     {
-        print_r(debug_backtrace());
         $this->setArguments(func_get_args());
     }
 

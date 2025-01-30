@@ -29,6 +29,11 @@ enum AdviceTypeEnum: string
     /** 异常通知（After Throwing） */
     case AfterThrowing = AfterThrowing::class;
 
+    public static function getAnnotationNames(): array
+    {
+        return array_map(fn (AdviceTypeEnum $class) => $class->value, self::cases());
+    }
+
     /**
      * 获取通知优先级
      * @return int
