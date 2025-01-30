@@ -1,9 +1,9 @@
 <?php
 
-namespace luoyue\aop\Attributes;
+namespace Luoyue\aop\Attributes;
 
 use LinFly\Annotation\AbstractAnnotationAttribute;
-use luoyue\aop\Attributes\parser\AspectParser;
+use Luoyue\aop\Attributes\parser\AspectParser;
 
 /**
  * 切面类注解
@@ -14,6 +14,7 @@ class Aspect extends AbstractAnnotationAttribute
 
     public function __construct(?int $priority = null)
     {
+        print_r(debug_backtrace());
         $this->setArguments(func_get_args());
     }
 

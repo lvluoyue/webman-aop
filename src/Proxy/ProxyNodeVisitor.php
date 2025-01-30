@@ -1,9 +1,9 @@
 <?php
 
-namespace luoyue\aop\Proxy;
+namespace Luoyue\aop\Proxy;
 
-use luoyue\aop\AopBootstrap;
-use luoyue\aop\Collects\node\PointcutNode;
+use Luoyue\aop\AopBootstrap;
+use Luoyue\aop\Collects\node\PointcutNode;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Arg;

@@ -1,9 +1,9 @@
 <?php
 
-namespace luoyue\aop\Proxy;
+namespace Luoyue\aop\Proxy;
 
-use luoyue\aop\exception\ProceedingJoinPointException;
-use luoyue\aop\interfaces\ProceedingJoinPointInterface;
+use Luoyue\aop\exception\ProceedingJoinPointException;
+use Luoyue\aop\interfaces\ProceedingJoinPointInterface;
 use Closure;
 use ReflectionFunction;
 use ReflectionMethod;

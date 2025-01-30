@@ -1,13 +1,13 @@
 <?php
 
-namespace luoyue\aop\enum;
+namespace Luoyue\aop\enum;
 
-use luoyue\aop\Attributes\After;
-use luoyue\aop\Attributes\AfterReturning;
-use luoyue\aop\Attributes\AfterThrowing;
-use luoyue\aop\Attributes\Around;
-use luoyue\aop\Attributes\Before;
-use luoyue\aop\interfaces\ProceedingJoinPointInterface;
+use Luoyue\aop\Attributes\After;
+use Luoyue\aop\Attributes\AfterReturning;
+use Luoyue\aop\Attributes\AfterThrowing;
+use Luoyue\aop\Attributes\Around;
+use Luoyue\aop\Attributes\Before;
+use Luoyue\aop\interfaces\ProceedingJoinPointInterface;
 
 /**
  * 通知类型枚举

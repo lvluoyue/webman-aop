@@ -1,10 +1,10 @@
 <?php
 
-namespace luoyue\aop;
+namespace Luoyue\aop;
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
-use luoyue\aop\Collects\AspectCollects;
-use luoyue\aop\Collects\ProxyCollects;
+use Luoyue\aop\Collects\AspectCollects;
+use Luoyue\aop\Collects\ProxyCollects;
 use support\Container;
 use Webman\Bootstrap;
 use Workerman\Worker;

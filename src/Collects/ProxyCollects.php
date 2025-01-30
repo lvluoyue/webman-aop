@@ -1,10 +1,10 @@
 <?php
 
-namespace luoyue\aop\Collects;
+namespace Luoyue\aop\Collects;
 
-use luoyue\aop\AopBootstrap;
-use luoyue\aop\Collects\node\PointcutNode;
-use luoyue\aop\Proxy\Rewrite;
+use Luoyue\aop\AopBootstrap;
+use Luoyue\aop\Collects\node\PointcutNode;
+use Luoyue\aop\Proxy\Rewrite;
 use support\Container;
 
 /**

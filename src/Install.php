@@ -1,6 +1,6 @@
 <?php
 
-namespace luoyue\aop;
+namespace Luoyue\aop;
 
 class Install
 {

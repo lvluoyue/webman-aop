@@ -1,6 +1,6 @@
 <?php
 
-namespace luoyue\aop\Attributes;
+namespace Luoyue\aop\Attributes;
 
 #[\Attribute(\Attribute::TARGET_METHOD)]
 class After

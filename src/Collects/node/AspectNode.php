@@ -1,8 +1,8 @@
 <?php
 
-namespace luoyue\aop\Collects\node;
+namespace Luoyue\aop\Collects\node;
 
-use luoyue\aop\enum\AdviceTypeEnum;
+use Luoyue\aop\enum\AdviceTypeEnum;
 use support\Container;
 
 /**

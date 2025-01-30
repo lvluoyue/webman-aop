@@ -16,7 +16,7 @@
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "luoyue\\aop\\": "src/"
+      "Luoyue\\aop\\": "src/"
     }
   },
   "authors": [

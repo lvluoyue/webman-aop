@@ -1,8 +1,8 @@
 <?php
 
-namespace luoyue\aop\Proxy;
+namespace Luoyue\aop\Proxy;
 
-use luoyue\aop\Collects\node\PointcutNode;
+use Luoyue\aop\Collects\node\PointcutNode;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;

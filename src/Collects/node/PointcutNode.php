@@ -1,9 +1,9 @@
 <?php
 
-namespace luoyue\aop\Collects\node;
+namespace Luoyue\aop\Collects\node;
 
-use luoyue\aop\AopBootstrap;
-use luoyue\aop\Collects\AspectManager;
+use Luoyue\aop\AopBootstrap;
+use Luoyue\aop\Collects\AspectManager;
 use SplPriorityQueue;
 
 /**

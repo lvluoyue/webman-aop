@@ -1,8 +1,8 @@
 <?php
 
-namespace luoyue\aop\Proxy;
+namespace Luoyue\aop\Proxy;
 
-use luoyue\aop\Collects\ProxyCollects;
+use Luoyue\aop\Collects\ProxyCollects;
 use support\Container;
 
 /**

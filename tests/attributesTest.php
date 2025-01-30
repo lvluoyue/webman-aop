@@ -1,6 +1,6 @@
 <?php
 
-use luoyue\aop\Attributes\parser\AspectParser;
+use Luoyue\aop\Attributes\parser\AspectParser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

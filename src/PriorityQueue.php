@@ -1,6 +1,6 @@
 <?php
 
-namespace luoyue\aop;
+namespace Luoyue\aop;
 
 use SplPriorityQueue;
 use function PHPUnit\Framework\isInt;

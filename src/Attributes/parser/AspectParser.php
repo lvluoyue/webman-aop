@@ -1,9 +1,9 @@
 <?php
 
-namespace luoyue\aop\Attributes\parser;
+namespace Luoyue\aop\Attributes\parser;
 
 use LinFly\Annotation\Contracts\IAnnotationParser;
-use luoyue\aop\Aspect;
+use Luoyue\aop\Aspect;
 
 /**
  * 切面类注解处理

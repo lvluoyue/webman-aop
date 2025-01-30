@@ -1,11 +1,10 @@
 <?php
 
-namespace luoyue\aop\Collects;
+namespace Luoyue\aop\Collects;
 
 use Generator;
 use LinFly\Annotation\Util\AnnotationUtil;
-use luoyue\aop\AopBootstrap;
-use luoyue\aop\Collects\node\AspectNode;
+use Luoyue\aop\Collects\node\AspectNode;
 use ReflectionClass;
 use SplFileInfo;
 use support\Container;

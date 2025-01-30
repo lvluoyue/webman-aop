@@ -1,6 +1,6 @@
 <?php
 
-namespace luoyue\aop\interfaces;
+namespace Luoyue\aop\interfaces;
 
 use ReflectionMethod;
 

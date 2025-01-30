@@ -1,9 +1,9 @@
 <?php
 
-namespace luoyue\aop\Proxy;
+namespace Luoyue\aop\Proxy;
 
 use Closure;
-use luoyue\aop\interfaces\ProceedingJoinPointInterface;
+use Luoyue\aop\interfaces\ProceedingJoinPointInterface;
 
 /**
  * Class PipeLine.
