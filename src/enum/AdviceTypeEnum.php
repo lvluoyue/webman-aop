@@ -69,20 +69,21 @@ enum AdviceTypeEnum: string
                 try {
                     $result = $entryClass->process();
                 } finally {
-                    $class->{$method}();
+                    $advice = $class->{$method}($result, $entryClass);
                 }
-                return $result;
+                return $advice === null ? $result : $advice;
             },
             self::AfterReturning => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
                 $result = $entryClass->process();
-                $class->{$method}($result);
-                return $result;
+                $advice = $class->{$method}($result, $entryClass);
+                print_r($advice);
+                return $advice === null ? $result : $advice;
             },
             self::AfterThrowing => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
                 try {
                     $result = $entryClass->process();
                 } catch (\Throwable $e) {
-                    $class->{$method}($e);
+                    $class->{$method}($e, $entryClass);
                     throw $e;
                 }
                 return $result;
