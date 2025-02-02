@@ -5,11 +5,14 @@ namespace Luoyue\aop;
 use LinFly\Annotation\Util\AnnotationUtil;
 use Luoyue\aop\Collects\AspectCollects;
 use Luoyue\aop\Collects\node\AspectNode;
+use Luoyue\aop\Collects\node\PointcutNode;
 use Luoyue\aop\Collects\ProxyCollects;
 use Luoyue\aop\enum\AdviceTypeEnum;
-use ReflectionAttribute;
+use Luoyue\aop\Proxy\Rewrite;
 use ReflectionClass;
+use ReflectionException;
 use SplFileInfo;
+use SplPriorityQueue;
 use support\Container;
 
 class Aspect
@@ -17,7 +20,7 @@ class Aspect
 
     private static Aspect $instance;
 
-    private PriorityQueue $queue;
+    private SplPriorityQueue $queue;
 
     private AspectCollects $aspectCollects;
 
@@ -26,7 +29,24 @@ class Aspect
 
     private function __construct()
     {
-        $this->queue = new PriorityQueue();
+        $this->queue = new class extends SplPriorityQueue
+        {
+
+            public function compare($priority1, $priority2): int
+            {
+                if ($priority1 === $priority2) {
+                    return 0;
+                }
+                // 数字优先
+                if (is_int($priority1) && !is_int($priority2)) {
+                    return 1;
+                }
+                if (!is_int($priority1) && is_int($priority2)) {
+                    return -1;
+                }
+                return $priority1 <=> $priority2;
+            }
+        };
         $this->aspectCollects = new AspectCollects();
         $this->proxyCollects = new ProxyCollects();
         $this->config = config('plugin.luoyue.aop.app');
@@ -57,13 +77,14 @@ class Aspect
         foreach ($this->config['scans'] as $scan) {
             $this->scanPointcut($scan);
         }
-        $this->proxyCollects->scan();
+        $this->scanProxy();
         return $this;
     }
 
     /**
      * 执行切面注解扫描逻辑
      * @return void
+     * @throws ReflectionException
      */
     private function scanAnnotations(): void
     {
@@ -72,13 +93,13 @@ class Aspect
             // 遍历切面类方法
             foreach ($reflectionClass->getMethods() as $method) {
                 //过滤非切面注解
-                foreach ($this->filterAttributes($method) as $annotation) {
+                foreach (AopUtils::filterAttributes($method) as $annotation) {
                     //获取方法名
                     $methodName = $method->getName();
                     //获取枚举对象
                     $adviceType = AdviceTypeEnum::tryFrom($annotation->getName());
                     //获取切入点正则表达式数组
-                    $matches = array_map([$this, 'getMatchesClasses'], (array)$annotation->getArguments()[0]);
+                    $matches = array_map([AopUtils::class, 'getMatchesClasses'], (array)$annotation->getArguments()[0]);
                     //将切面节点添加到切面收集器中
                     $this->aspectCollects->addAspects(new AspectNode($aspectClass, $methodName, $adviceType, $matches));
                 }
@@ -90,8 +111,9 @@ class Aspect
      * 扫描切入点目录
      * @param string $dir
      * @return void
+     * @throws ReflectionException
      */
-    public function scanPointcut(string $dir): void
+    private function scanPointcut(string $dir): void
     {
         $dirIterator = new \RecursiveDirectoryIterator($dir);
         $iterator = new \RecursiveIteratorIterator($dirIterator);
@@ -127,30 +149,22 @@ class Aspect
         }
     }
 
-    /**
-     * 过滤切面类注解
-     * @return ReflectionAttribute[]
-     */
-    private function filterAttributes(\ReflectionMethod $method): array
+    public function scanProxy(): void
     {
-        return array_filter($method->getAttributes(), function (ReflectionAttribute $attribute) {
-            return in_array($attribute->getName(), AdviceTypeEnum::getAnnotationNames());
-        });
-    }
-
-    /**
-     * 将切入点表达式解析为正则表达式
-     * @param string $class
-     * @return array
-     */
-    private function getMatchesClasses(string $class): array
-    {
-        $explode = explode('::', $class, 2);
-        $explode[1] ??= '*';
-        return [
-            'class' => str_replace(['\\', '**', '*', '#'], ['\\\\', '.#', '[^\\\\]#', '*'], $explode[0]),
-            'method' => str_replace(['*', '\\'], ['.*', '\\\\'], $explode[1])
-        ];
+        $rewrite = new Rewrite();
+        /** @var PointcutNode[] $map */
+        foreach ($this->proxyCollects->getPointcutMap() as $map) {
+            [$className, $pointcutNode] = $map;
+            $proxyClass = $pointcutNode->getProxyClassName(true);
+            $rewrite->rewrite($pointcutNode);
+            $container = Container::instance();
+            AopBootstrap::getComposerClassLoader()->addClassMap([$proxyClass => $pointcutNode->getProxyFile(true)]);
+            if ($container instanceof \Webman\Container) {
+                Container::make($className, Container::get($proxyClass));
+            } else if ($container instanceof \DI\Container) {
+                $container->set($className, \DI\autowire($proxyClass));
+            }
+        }
     }
 
 }

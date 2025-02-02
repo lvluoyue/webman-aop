@@ -2,11 +2,8 @@
 
 namespace Luoyue\aop\Collects;
 
-use Luoyue\aop\AopBootstrap;
+use Generator;
 use Luoyue\aop\Collects\node\PointcutNode;
-use Luoyue\aop\Proxy\Rewrite;
-use support\Container;
-
 /**
  * 代理类收集器
  */
@@ -15,20 +12,16 @@ class ProxyCollects
     /** @var array<string, PointcutNode> $PointcutMap 切入点集合 */
     private array $PointcutMap = [];
 
-    public function scan()
+    /**
+     * 遍历所有切入点表达式
+     * @return Generator
+     */
+    public function getPointcutMap(): ?Generator
     {
-        $rewrite = new Rewrite();
         foreach ($this->PointcutMap as $className => $pointcutNode) {
-            $proxyClass = $pointcutNode->getProxyClassName(true);
-            $rewrite->rewrite($pointcutNode);
-            $container = Container::instance();
-            AopBootstrap::getComposerClassLoader()->addClassMap([$proxyClass => $pointcutNode->getProxyFile(true)]);
-            if ($container instanceof \Webman\Container) {
-                Container::make($className, Container::get($proxyClass));
-            } else if ($container instanceof \DI\Container) {
-                $container->set($className, \DI\autowire($proxyClass));
-            }
+            yield [$className, $pointcutNode];
         }
+        return null;
     }
 
     /**
