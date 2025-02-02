@@ -57,6 +57,11 @@ class Aspect
         return self::$instance ??= new self();
     }
 
+    public function getAspectCollects(): AspectCollects
+    {
+        return $this->aspectCollects;
+    }
+
     public function getProxyCollects(): ProxyCollects
     {
         return $this->proxyCollects;
@@ -92,8 +97,9 @@ class Aspect
             $reflectionClass = new ReflectionClass($aspectClass);
             // 遍历切面类方法
             foreach ($reflectionClass->getMethods() as $method) {
+                $reflectionAttributes = AopUtils::filterAttributes($method, AdviceTypeEnum::getAnnotationNames());
                 //过滤非切面注解
-                foreach (AopUtils::filterAttributes($method) as $annotation) {
+                foreach ($reflectionAttributes as $annotation) {
                     //获取方法名
                     $methodName = $method->getName();
                     //获取枚举对象

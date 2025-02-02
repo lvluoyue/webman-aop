@@ -68,10 +68,11 @@ class PointcutNode
      * @param AspectNode $aspectNode
      * @return void
      */
-    public function addPointcutMethod(string $method, AspectNode $aspectNode): void
+    public function addPointcutMethod(string $method, AspectNode $aspectNode): static
     {
         $this->pointcutMethod[$method] ??= new SplPriorityQueue();
         $this->pointcutMethod[$method]->insert($aspectNode, $aspectNode->getPriority());
+        return $this;
     }
 
     /**

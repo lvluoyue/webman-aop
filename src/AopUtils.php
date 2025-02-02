@@ -9,12 +9,14 @@ class AopUtils  {
 
     /**
      * 过滤切面类注解
+     * @param \ReflectionMethod $method
+     * @param array $classes
      * @return ReflectionAttribute[]
      */
-    public static function filterAttributes(\ReflectionMethod $method): array
+    public static function filterAttributes(\ReflectionMethod $method,array|string $classes): array
     {
-        return array_filter($method->getAttributes(), function (ReflectionAttribute $attribute) {
-            return in_array($attribute->getName(), AdviceTypeEnum::getAnnotationNames());
+        return array_filter($method->getAttributes(), function (ReflectionAttribute $attribute) use ($classes) {
+            return in_array($attribute->getName(), (array)$classes);
         });
     }
 

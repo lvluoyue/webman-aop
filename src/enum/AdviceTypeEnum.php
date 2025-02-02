@@ -62,8 +62,8 @@ enum AdviceTypeEnum: string
                 return $class->{$method}($entryClass);
             },
             AdviceTypeEnum::Before => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
-                $class->{$method}();
-                return $entryClass->process();
+                $advice = $class->{$method}($entryClass);
+                return $advice === null ? $entryClass->process() : $advice;
             },
             AdviceTypeEnum::After => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
                 try {
@@ -76,7 +76,6 @@ enum AdviceTypeEnum: string
             self::AfterReturning => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
                 $result = $entryClass->process();
                 $advice = $class->{$method}($result, $entryClass);
-                print_r($advice);
                 return $advice === null ? $result : $advice;
             },
             self::AfterThrowing => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
