@@ -2,6 +2,7 @@
 
 namespace Luoyue\aop\Proxy;
 
+use Luoyue\aop\Aspect;
 use Luoyue\aop\Collects\ProxyCollects;
 use support\Container;
 
@@ -19,8 +20,7 @@ trait ProxyCallTrait
 
     protected static function _getClosure(string $className, string $classMethod): array
     {
-        /** @var ProxyCollects $proxyCollects */
-        $proxyCollects = Container::get(ProxyCollects::class);
+        $proxyCollects = Aspect::getInstance()->getProxyCollects();
         return $proxyCollects->getAspectsClosure($className, $classMethod);
     }
 

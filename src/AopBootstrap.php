@@ -3,9 +3,6 @@
 namespace Luoyue\aop;
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
-use Luoyue\aop\Collects\AspectCollects;
-use Luoyue\aop\Collects\ProxyCollects;
-use support\Container;
 use Webman\Bootstrap;
 use Workerman\Worker;
 
@@ -28,11 +25,7 @@ class AopBootstrap implements Bootstrap
             $time = microtime(true);
         }
 
-        Aspect::getInstance()->scan($config);
-
-        /** @var ProxyCollects $proxyCollects */
-        $proxyCollects = Container::get(ProxyCollects::class);
-        $proxyCollects->scan();
+        Aspect::getInstance()->scan();
 
         if ($isFirstWorker) {
             $time = round(microtime(true) - $time, 3);
