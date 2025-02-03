@@ -25,7 +25,19 @@ class AopBootstrap implements Bootstrap
             $time = microtime(true);
         }
 
-        Aspect::getInstance()->scan();
+        $interface = Aspect::getInstance();
+
+        if($config['aspect'] ?? []) {
+            foreach ($config['aspect'] as $aspect) {
+                $interface->addAspect($aspect);
+            }
+        }
+
+        $interface->scan();
+
+        if($config['reload'] ?? true) {
+            $interface->reload();
+        }
 
         if ($isFirstWorker) {
             $time = round(microtime(true) - $time, 3);

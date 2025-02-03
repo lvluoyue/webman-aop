@@ -27,6 +27,8 @@ class Aspect
     private array $config;
     private ProxyCollects $proxyCollects;
 
+    private static bool $isInit = false;
+
     private function __construct()
     {
         $this->queue = new class extends SplPriorityQueue
@@ -82,7 +84,7 @@ class Aspect
         foreach ($this->config['scans'] as $scan) {
             $this->scanPointcut($scan);
         }
-        $this->scanProxy();
+//        $this->scanProxy();
         return $this;
     }
 
@@ -155,7 +157,7 @@ class Aspect
         }
     }
 
-    public function scanProxy(): void
+    public function reload(): void
     {
         $rewrite = new Rewrite();
         /** @var PointcutNode[] $map */
