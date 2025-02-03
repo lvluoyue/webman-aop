@@ -33,11 +33,7 @@ class AopBootstrap implements Bootstrap
             }
         }
 
-        $interface->scan();
-
-        if($config['reload'] ?? true) {
-            $interface->reload();
-        }
+        $interface->scan()->reload();
 
         if ($isFirstWorker) {
             $time = round(microtime(true) - $time, 3);
