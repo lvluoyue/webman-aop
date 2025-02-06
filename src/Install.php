@@ -4,17 +4,17 @@ namespace Luoyue\aop;
 
 class Install
 {
-    const WEBMAN_PLUGIN = true;
+    public const WEBMAN_PLUGIN = true;
 
     /**
      * @var array
      */
-    protected static $pathRelation = array(
+    protected static $pathRelation = [
         'config/plugin/luoyue/aop' => 'config/plugin/luoyue/aop',
-    );
+    ];
 
     /**
-     * Install
+     * Install.
      * @return void
      */
     public static function install()
@@ -23,7 +23,7 @@ class Install
     }
 
     /**
-     * Uninstall
+     * Uninstall.
      * @return void
      */
     public static function uninstall()
@@ -32,7 +32,7 @@ class Install
     }
 
     /**
-     * installByRelation
+     * installByRelation.
      * @return void
      */
     public static function installByRelation()
@@ -41,7 +41,7 @@ class Install
             if ($pos = strrpos($dest, '/')) {
                 $parent_dir = base_path() . '/' . substr($dest, 0, $pos);
                 if (!is_dir($parent_dir)) {
-                    mkdir($parent_dir, 0777, true);
+                    mkdir($parent_dir, 0o777, true);
                 }
             }
             copy_dir(__DIR__ . "/$source", base_path() . "/$dest");
@@ -49,7 +49,7 @@ class Install
     }
 
     /**
-     * uninstallByRelation
+     * uninstallByRelation.
      * @return void
      */
     public static function uninstallByRelation()
@@ -62,5 +62,4 @@ class Install
             remove_dir($path);
         }
     }
-
 }

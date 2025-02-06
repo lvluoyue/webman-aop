@@ -145,6 +145,120 @@ if (! function_exists('load')) {
 - **匹配所有类的info**：`**::info` （目前有bug）
 - **匹配所有类的所有方法**：`**::*` （目前有bug）
 
+## 注解AOP
+使用`linfly/annotation`的自定义注解可以实现注解AOP
+
+定义如下注解：
+```php
+<?php
+
+namespace Luoyue\WebmanMvcCore\annotation\cache;
+
+use LinFly\Annotation\AbstractAnnotationAttribute;
+
+#[\Attribute(\Attribute::TARGET_METHOD)]
+class Cached extends AbstractAnnotationAttribute
+{
+
+    public function __construct()
+    {
+        $this->setArguments(func_get_args());
+    }
+
+    public static function getParser(): array|string
+    {
+        return CachedParser::class;
+    }
+
+}
+```
+
+然后定义如下切面：
+```php
+<?php
+
+namespace Luoyue\WebmanMvcCore\aop;
+
+use Luoyue\aop\Attributes\AfterReturning;
+use Luoyue\aop\interfaces\ProceedingJoinPointInterface;
+use Luoyue\WebmanMvcCore\annotation\cache\parser\CachedParser;
+
+class CacheAspect
+{
+    #[AfterReturning('')]//这里只是标记，实际不会执行（也可以不写）
+    public function cachedReturning($res, ProceedingJoinPointInterface $proceedingJoinPoint): mixed
+    {
+        $sign = $proceedingJoinPoint->getClassName() . '::' . $proceedingJoinPoint->getMethodName();
+        $props = call_user_func([CachedParser::class, 'getParams'], $sign);//获取注解参数
+        print_r($props);
+        return null;
+    }
+}
+```
+
+定义注解处理器：
+```php
+<?php
+
+namespace Luoyue\WebmanMvcCore\annotation\cache\parser;
+
+use LinFly\Annotation\Contracts\IAnnotationParser;
+use Luoyue\aop\Aspect;
+use Luoyue\aop\Collects\node\AspectNode;
+use Luoyue\aop\enum\AdviceTypeEnum;
+use Luoyue\WebmanMvcCore\aop\CacheAspect;
+
+class CachedParser implements iAnnotationParser
+{
+
+    public static array $cachedParams = [];
+
+    public static function process(array $item): void
+    {
+        self::$cachedParams[$item['class'] . '::' . $item['method']] = $item['parameters'];
+        $aspectCollects = Aspect::getInstance()->getAspectCollects();
+        $proxyCollects = Aspect::getInstance()->getProxyCollects();
+        $cachedBefore = $aspectCollects->getAspectNode(CacheAspect::class, 'cachedBefore') ?? new AspectNode(
+            CacheAspect::class,//切面类
+            'cachedBefore',//切面方法
+            AdviceTypeEnum::Before,//通知类型
+            []);//获取切面节点
+        $proxyCollects->getPointcutNode($item['class'])
+            ->addPointcutMethod($item['method'], $cachedBefore);//添加切入点
+        Aspect::getInstance()->scan();//重新扫描注解
+    }
+
+    public static function getParams(?string $sign = null): array
+    {
+        if (isset(self::$cachedParams[$sign])) {
+            return self::$cachedParams[$sign];
+        }
+        return self::$cachedParams;
+    }
+}
+```
+
+然后在controller中添加如下代码：
+
+```php
+<?php
+
+namespace app\controller;
+
+use LinFly\Annotation\Attributes\Route\GetMapping;
+use Luoyue\WebmanMvcCore\annotation\cache\Cached;
+
+class Index
+{
+    #[GetMapping]
+    #[Cached]
+    public function index()
+    {
+        return 'index';
+    }
+}
+```
+
 ## TODO
 - [x] 新增After、AfterReturning、AfterThrowing、Before注解
 - [x] 切入点表达式支持两个通配符（一个星号和两个星号）

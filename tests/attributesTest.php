@@ -1,6 +1,5 @@
 <?php
 
-use Luoyue\aop\Attributes\parser\AspectParser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +12,7 @@ class attributesTest extends TestCase
     public function annotationTest(string $class, $throws): void
     {
         $throws && $this->expectException($throws);
-        new $class('');
+        new $class($class !== \Luoyue\aop\Attributes\Aspect::class ? '' : 1);
         $this->assertTrue(true);
     }
 
@@ -21,27 +20,27 @@ class attributesTest extends TestCase
     {
         return [
             'After' => [
-                'class' => \luoyue\aop\Attributes\After::class,
+                'class' => \Luoyue\aop\Attributes\After::class,
                 'throws' => \InvalidArgumentException::class,
             ],
             'AfterReturning' => [
-                'class' => \luoyue\aop\Attributes\AfterReturning::class,
+                'class' => \Luoyue\aop\Attributes\AfterReturning::class,
                 'throws' => \InvalidArgumentException::class,
             ],
             'AfterThrowing' => [
-                'class' => \luoyue\aop\Attributes\AfterThrowing::class,
+                'class' => \Luoyue\aop\Attributes\AfterThrowing::class,
                 'throws' => \InvalidArgumentException::class,
             ],
             'Before' => [
-                'class' => \luoyue\aop\Attributes\Before::class,
+                'class' => \Luoyue\aop\Attributes\Before::class,
                 'throws' => \InvalidArgumentException::class,
             ],
             'Around' => [
-                'class' => \luoyue\aop\Attributes\Around::class,
+                'class' => \Luoyue\aop\Attributes\Around::class,
                 'throws' => \InvalidArgumentException::class,
             ],
             'Aspect' => [
-                'class' => \luoyue\aop\Attributes\Aspect::class,
+                'class' => \Luoyue\aop\Attributes\Aspect::class,
                 'throws' => '',
             ],
         ];
@@ -51,8 +50,7 @@ class attributesTest extends TestCase
     #[DataProvider('classesData')]
     public function matchesClassesTest(string $classes, string $resultClass, string $resultMethod): void
     {
-        $reflectionMethod = new ReflectionMethod(AspectParser::class, 'getMatchesClasses');
-        [$class, $method] = array_values($reflectionMethod->invoke(null, $classes));
+        [$class, $method] = array_values(\Luoyue\aop\AopUtils::getMatchesClasses($classes));
         $this->assertEquals($resultClass, $class, '类名不匹配');
         $this->assertEquals($resultMethod, $method, '方法名不匹配');
     }

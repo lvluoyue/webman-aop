@@ -6,7 +6,7 @@ namespace Luoyue\aop\Attributes;
 class After
 {
     /**
-     * 后置通知（After）
+     * 后置通知（After）.
      * @param array|string $pointcut 切入点表达式
      */
     public function __construct(array|string $pointcut)

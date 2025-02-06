@@ -9,15 +9,19 @@
     "nikic/php-parser": "^5.0"
   },
   "require-dev": {
-    "workerman/webman-framework": "^1.6",
+    "workerman/webman-framework": "^2.0",
     "php-di/php-di": "^7.0",
-    "phpunit/phpunit": "^11.5"
+    "phpunit/phpunit": "^11.5",
+    "friendsofphp/php-cs-fixer": "^3.68"
   },
   "license": "MIT",
   "autoload": {
     "psr-4": {
       "Luoyue\\aop\\": "src/"
     }
+  },
+  "scripts": {
+    "format-code": "php-cs-fixer fix --allow-risky=yes"
   },
   "authors": [
     {

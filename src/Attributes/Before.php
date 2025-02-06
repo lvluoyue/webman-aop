@@ -6,7 +6,7 @@ namespace Luoyue\aop\Attributes;
 class Before
 {
     /**
-     * 前置通知（Before）
+     * 前置通知（Before）.
      * @param array|string $pointcut 切入点表达式
      */
     public function __construct(array|string $pointcut)

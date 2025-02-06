@@ -6,7 +6,7 @@ namespace Luoyue\aop\Attributes;
 class AfterThrowing
 {
     /**
-     * 异常通知（After Throwing）
+     * 异常通知（After Throwing）.
      * @param array|string $pointcut 切入点表达式
      */
     public function __construct(array|string $pointcut)

@@ -18,19 +18,17 @@ class PipeLine
     }
 
     /**
-     * 运行管道
-     * @param ProceedingJoinPointInterface $entry
-     * @return mixed
+     * 运行管道.
      */
     public function run(ProceedingJoinPointInterface $entry): mixed
     {
         $pipe = array_reduce($this->pipes, $this->callback(), $this->default());
+
         return $pipe($entry);
     }
 
     /**
-     * 默认管道（调用原始方法）
-     * @return Closure
+     * 默认管道（调用原始方法）.
      */
     private function default(): Closure
     {
@@ -38,8 +36,7 @@ class PipeLine
     }
 
     /**
-     * 管道回调
-     * @return Closure
+     * 管道回调.
      */
     private function callback(): Closure
     {
@@ -47,6 +44,7 @@ class PipeLine
             return function (ProceedingJoinPointInterface $entryClass) use ($res, $pipe) {
                 $tempPipe = $pipe;
                 $entryClass->pipe = $res;
+
                 return $tempPipe($entryClass);
             };
         };

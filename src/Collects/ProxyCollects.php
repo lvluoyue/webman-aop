@@ -4,30 +4,29 @@ namespace Luoyue\aop\Collects;
 
 use Generator;
 use Luoyue\aop\Collects\node\PointcutNode;
+
 /**
- * 代理类收集器
+ * 代理类收集器.
  */
 class ProxyCollects
 {
-    /** @var array<string, PointcutNode> $PointcutMap 切入点集合 */
+    /** @var array<string, PointcutNode> 切入点集合 */
     private array $PointcutMap = [];
 
     /**
-     * 遍历所有切入点表达式
-     * @return Generator
+     * 遍历所有切入点表达式.
      */
     public function getPointcutMap(): ?Generator
     {
         foreach ($this->PointcutMap as $className => $pointcutNode) {
             yield [$className, $pointcutNode];
         }
+
         return null;
     }
 
     /**
-     * 获取切入点节点
-     * @param string $className
-     * @return PointcutNode
+     * 获取切入点节点.
      */
     public function getPointcutNode(string $className): PointcutNode
     {
@@ -35,10 +34,7 @@ class ProxyCollects
     }
 
     /**
-     * 获取切面闭包集合
-     * @param string $className
-     * @param string $method
-     * @return array
+     * 获取切面闭包集合.
      */
     public function getAspectsClosure(string $className, string $method): array
     {
@@ -46,7 +42,7 @@ class ProxyCollects
             return [];
         }
         $targetData = $this->PointcutMap[$className];
+
         return $targetData->getAdviceClosure($method);
     }
-
 }

@@ -6,23 +6,23 @@ use Luoyue\aop\enum\AdviceTypeEnum;
 use support\Container;
 
 /**
- * 切面节点
+ * 切面节点.
  */
 class AspectNode
 {
-    /** @var string $aspectClass 切面类名 */
+    /** @var string 切面类名 */
     private string $aspectClass;
 
-    /** @var string $adviceMethod 通知方法 */
+    /** @var string 通知方法 */
     private string $adviceMethod;
 
-    /** @var AdviceTypeEnum $adviceType 切入点类型 */
+    /** @var AdviceTypeEnum 切入点类型 */
     private AdviceTypeEnum $adviceType;
 
-    /** @var array $pointcut 切入点表达式 */
+    /** @var array 切入点表达式 */
     private array $pointcut;
 
-    /** @var PointcutNode[] $matchesPointcut 表达式匹配的切入点 */
+    /** @var PointcutNode[] 表达式匹配的切入点 */
     private array $matchesPointcut = [];
 
     public function __construct(string $aspectClass, string $adviceMethod, AdviceTypeEnum $adviceType, array $pointcut)
@@ -34,8 +34,7 @@ class AspectNode
     }
 
     /**
-     * 获取切面类名
-     * @return string
+     * 获取切面类名.
      */
     public function getClassName(): string
     {
@@ -48,8 +47,7 @@ class AspectNode
     }
 
     /**
-     * 获取切面优先级
-     * @return int
+     * 获取切面优先级.
      */
     public function getPriority(): int
     {
@@ -57,8 +55,7 @@ class AspectNode
     }
 
     /**
-     * 获取通知闭包
-     * @return \Closure
+     * 获取通知闭包.
      */
     public function getAdviceClosure(): \Closure
     {
@@ -71,8 +68,7 @@ class AspectNode
     }
 
     /**
-     * 获取切入点表达式
-     * @return array
+     * 获取切入点表达式.
      */
     public function getPointcut(): array
     {
@@ -80,13 +76,10 @@ class AspectNode
     }
 
     /**
-     * 添加匹配的切入点
-     * @param PointcutNode $pointcutData
-     * @return void
+     * 添加匹配的切入点.
      */
-    public function addMatchesPointcut(PointcutNode $pointcutData)
+    public function addMatchesPointcut(PointcutNode $pointcutData): void
     {
         $this->matchesPointcut[] = $pointcutData;
     }
-
 }

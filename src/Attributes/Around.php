@@ -6,7 +6,7 @@ namespace Luoyue\aop\Attributes;
 class Around
 {
     /**
-     * 环绕通知（Around）
+     * 环绕通知（Around）.
      * @param array|string $pointcut 切入点表达式
      */
     public function __construct(array|string $pointcut)

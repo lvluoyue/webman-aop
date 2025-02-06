@@ -4,15 +4,13 @@ namespace Luoyue\aop\Collects;
 
 use Generator;
 use Luoyue\aop\Collects\node\AspectNode;
-use Luoyue\aop\Collects\node\PointcutNode;
 
 /**
- * 切面类收集器
+ * 切面类收集器.
  */
 class AspectCollects
 {
-
-    /** @var AspectNode[] $aspectsClass 切面集合 */
+    /** @var AspectNode[] 切面集合 */
     private array $aspectsClass = [];
 
     public function addAspects(AspectNode $aspectsClass)
@@ -21,9 +19,7 @@ class AspectCollects
     }
 
     /**
-     * 获取切面节点
-     * @param string $className
-     * @return AspectNode
+     * 获取切面节点.
      */
     public function getAspectNode(string $className, string $methodName): ?AspectNode
     {
@@ -31,8 +27,7 @@ class AspectCollects
     }
 
     /**
-     * 遍历所有切入点表达式
-     * @return Generator
+     * 遍历所有切入点表达式.
      */
     public function getAspectsClasses(): Generator
     {

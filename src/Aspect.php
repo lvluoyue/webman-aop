@@ -17,7 +17,6 @@ use support\Container;
 
 class Aspect
 {
-
     private static Aspect $instance;
 
     private SplPriorityQueue $queue;
@@ -31,21 +30,20 @@ class Aspect
 
     private function __construct()
     {
-        $this->queue = new class extends SplPriorityQueue
-        {
-
+        $this->queue = new class extends SplPriorityQueue {
             public function compare($priority1, $priority2): int
             {
                 if ($priority1 === $priority2) {
                     return 0;
                 }
                 // 数字优先
-                if (is_int($priority1) && !is_int($priority2)) {
+                if (\is_int($priority1) && !\is_int($priority2)) {
                     return 1;
                 }
-                if (!is_int($priority1) && is_int($priority2)) {
+                if (!\is_int($priority1) && \is_int($priority2)) {
                     return -1;
                 }
+
                 return $priority1 <=> $priority2;
             }
         };
@@ -54,7 +52,7 @@ class Aspect
         $this->config = config('plugin.luoyue.aop.app');
     }
 
-    public static function getInstance(): Aspect
+    public static function getInstance(): self
     {
         return self::$instance ??= new self();
     }
@@ -75,6 +73,7 @@ class Aspect
             $priority = $aspectClass;
         }
         $this->queue->insert($aspectClass, $priority);
+
         return $this;
     }
 
@@ -84,13 +83,13 @@ class Aspect
         foreach ($this->config['scans'] as $scan) {
             $this->scanPointcut($scan);
         }
-//        $this->scanProxy();
+
+        //        $this->scanProxy();
         return $this;
     }
 
     /**
-     * 执行切面注解扫描逻辑
-     * @return void
+     * 执行切面注解扫描逻辑.
      * @throws ReflectionException
      */
     private function scanAnnotations(): void
@@ -100,15 +99,15 @@ class Aspect
             // 遍历切面类方法
             foreach ($reflectionClass->getMethods() as $method) {
                 $reflectionAttributes = AopUtils::filterAttributes($method, AdviceTypeEnum::getAnnotationNames());
-                //过滤非切面注解
+                // 过滤非切面注解
                 foreach ($reflectionAttributes as $annotation) {
-                    //获取方法名
+                    // 获取方法名
                     $methodName = $method->getName();
-                    //获取枚举对象
+                    // 获取枚举对象
                     $adviceType = AdviceTypeEnum::tryFrom($annotation->getName());
-                    //获取切入点正则表达式数组
-                    $matches = array_map([AopUtils::class, 'getMatchesClasses'], (array)$annotation->getArguments()[0]);
-                    //将切面节点添加到切面收集器中
+                    // 获取切入点正则表达式数组
+                    $matches = array_map([AopUtils::class, 'getMatchesClasses'], (array) $annotation->getArguments()[0]);
+                    // 将切面节点添加到切面收集器中
                     $this->aspectCollects->addAspects(new AspectNode($aspectClass, $methodName, $adviceType, $matches));
                 }
             }
@@ -116,9 +115,7 @@ class Aspect
     }
 
     /**
-     * 扫描切入点目录
-     * @param string $dir
-     * @return void
+     * 扫描切入点目录.
      * @throws ReflectionException
      */
     private function scanPointcut(string $dir): void
@@ -127,28 +124,28 @@ class Aspect
         $iterator = new \RecursiveIteratorIterator($dirIterator);
         /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
-            if ($file->isFile() && $file->getExtension() == 'php') {
-                //扫描文件中的类名集合
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                // 扫描文件中的类名集合
                 $classNames = AnnotationUtil::getAllClassesInFile($file->getPathname());
-                //遍历切入点
+                // 遍历切入点
                 foreach ($this->aspectCollects->getAspectsClasses() as $data) {
-                    //遍历文件类名
+                    // 遍历文件类名
                     foreach ($classNames as $className) {
                         /** @var AspectNode $aspect */
                         [$aspect, $class, $matchesMethod] = array_values($data);
-                        //匹配切入点
-                        if(preg_match("#^{$class}$#", $className)) {
+                        // 匹配切入点
+                        if (preg_match("#^{$class}$#", $className)) {
                             $reflectionClass = new ReflectionClass($className);
-                            if($reflectionClass->isInterface() || $reflectionClass->isEnum()) {//判断是否是class
+                            if ($reflectionClass->isInterface() || $reflectionClass->isEnum()) {// 判断是否是class
                                 continue;
                             }
                             $pointcutNode = $this->proxyCollects->getPointcutNode($className);
                             foreach ($reflectionClass->getMethods() as $method) {
-                                if(preg_match("#^{$matchesMethod}$#", $method->getName())) {
+                                if (preg_match("#^{$matchesMethod}$#", $method->getName())) {
                                     $pointcutNode->addPointcutMethod($method->getName(), $aspect);
                                 }
                             }
-                            //将切入节点添加到切面节点
+                            // 将切入节点添加到切面节点
                             $aspect->addMatchesPointcut($pointcutNode);
                         }
                     }
@@ -169,10 +166,9 @@ class Aspect
             AopBootstrap::getComposerClassLoader()->addClassMap([$proxyClass => $pointcutNode->getProxyFile(true)]);
             if ($container instanceof \Webman\Container) {
                 Container::make($className, Container::get($proxyClass));
-            } else if ($container instanceof \DI\Container) {
+            } elseif ($container instanceof \DI\Container) {
                 $container->set($className, \DI\autowire($proxyClass));
             }
         }
     }
-
 }

@@ -6,6 +6,9 @@ class AspectManager
 {
     protected static array $container = [];
 
+    /**
+     * @return Closure[]
+     */
     public static function get(string $class, string $method): array
     {
         return static::$container[$class][$method] ?? [];

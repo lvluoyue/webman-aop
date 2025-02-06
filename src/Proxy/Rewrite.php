@@ -13,7 +13,6 @@ use PhpParser\PrettyPrinter\Standard;
  */
 class Rewrite
 {
-
     private Parser $parser;
 
     private Standard $prettyPrinter;
@@ -25,14 +24,12 @@ class Rewrite
     }
 
     /**
-     * 重写代理类
-     * @param PointcutNode $item
-     * @return void
+     * 重写代理类.
      */
     public function rewrite(PointcutNode $item): void
     {
         $traverser = new NodeTraverser();
-        //获取原始代码
+        // 获取原始代码
         $code = file_get_contents($item->getClassFile());
         $ast = $this->parser->parse($code);
         $traverser->addVisitor(new ProxyNodeVisitor($item));
@@ -41,5 +38,4 @@ class Rewrite
         $proxyFile = $item->getProxyFile(true);
         file_put_contents($proxyFile, $newCode);
     }
-
 }

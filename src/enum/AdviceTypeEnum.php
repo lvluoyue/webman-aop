@@ -10,7 +10,7 @@ use Luoyue\aop\Attributes\Before;
 use Luoyue\aop\interfaces\ProceedingJoinPointInterface;
 
 /**
- * 通知类型枚举
+ * 通知类型枚举.
  */
 enum AdviceTypeEnum: string
 {
@@ -35,8 +35,7 @@ enum AdviceTypeEnum: string
     }
 
     /**
-     * 获取通知优先级
-     * @return int
+     * 获取通知优先级.
      */
     public function getPriority(): int
     {
@@ -50,10 +49,7 @@ enum AdviceTypeEnum: string
     }
 
     /**
-     * 获取通知逻辑闭包
-     * @param object $class
-     * @param string $method
-     * @return \Closure
+     * 获取通知逻辑闭包.
      */
     public function getAdviceClosure(object $class, string $method): \Closure
     {
@@ -63,6 +59,7 @@ enum AdviceTypeEnum: string
             },
             AdviceTypeEnum::Before => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
                 $advice = $class->{$method}($entryClass);
+
                 return $advice === null ? $entryClass->process() : $advice;
             },
             AdviceTypeEnum::After => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
@@ -71,11 +68,13 @@ enum AdviceTypeEnum: string
                 } finally {
                     $advice = $class->{$method}($result, $entryClass);
                 }
+
                 return $advice === null ? $result : $advice;
             },
             self::AfterReturning => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
                 $result = $entryClass->process();
                 $advice = $class->{$method}($result, $entryClass);
+
                 return $advice === null ? $result : $advice;
             },
             self::AfterThrowing => function (ProceedingJoinPointInterface $entryClass) use ($class, $method) {
@@ -85,9 +84,9 @@ enum AdviceTypeEnum: string
                     $class->{$method}($e, $entryClass);
                     throw $e;
                 }
+
                 return $result;
             },
         };
     }
-
 }

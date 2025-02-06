@@ -37,12 +37,11 @@ use PhpParser\NodeVisitorAbstract;
  */
 class ProxyNodeVisitor extends NodeVisitorAbstract
 {
-
     private string $currentClass = '';
 
     private Identifier $class;
 
-    private $extends = null;
+    private $extends;
 
     public function __construct(private PointcutNode $proxyCollects)
     {
@@ -52,14 +51,16 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
     {
         foreach ($nodes as $namespace) {
             foreach ($namespace->stmts as $class) {
-                if ($class instanceof Node\Stmt\Class_) {
+                if ($class instanceof Class_) {
                     $this->class = $class->name;
                     $this->extends = $class->extends ?? null;
                     $this->currentClass = $namespace->name . '\\' . $class->name;
+
                     return null;
                 }
             }
         }
+
         return null;
     }
 
@@ -70,6 +71,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
                 if (!$this->shouldRewrite($node)) {
                     return $this->formatMethod($node);
                 }
+
                 return $this->rewriteMethod($node);
             case $node instanceof Trait_:
                 // If the node is trait and php version >= 7.3, it can `use ProxyTrait` like class.
@@ -83,14 +85,16 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
                 }
                 $node->stmts = $stmts;
                 unset($stmts);
-                if(!$node->isAnonymous()) {
-                    $node->extends = new Node\Name($node->name->name);
-                    $node->name = new Node\Identifier($this->proxyCollects->getProxyClassName());
+                if (!$node->isAnonymous()) {
+                    $node->extends = new Name($node->name->name);
+                    $node->name = new Identifier($this->proxyCollects->getProxyClassName());
                 }
+
                 return $node;
             case ($node instanceof StaticPropertyFetch || $node instanceof StaticCall) && $this->extends:
-                if ($node->class instanceof Node\Name && 'parent' === $node->class->toString()) {
+                if ($node->class instanceof Name && 'parent' === $node->class->toString()) {
                     $node->class = new Name($this->extends->toCodeString());
+
                     return $node;
                 }
                 break;
@@ -109,7 +113,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
             case $node instanceof MagicConstDir:
                 // Rewrite __DIR__ as the real directory path
                 if ($file = AopBootstrap::getComposerClassLoader()->findFile($this->currentClass)) {
-                    return new String_(dirname(realpath($file)));
+                    return new String_(\dirname(realpath($file)));
                 }
                 break;
             case $node instanceof MagicConstFile:
@@ -119,6 +123,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
                 }
                 break;
         }
+
         return null;
     }
 
@@ -131,10 +136,10 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
         if ('__construct' === $node->name->toString()) {
             // Rewrite parent::__construct to class::__construct.
             foreach ($node->stmts as $stmt) {
-                if ($stmt instanceof Expression && $stmt->expr instanceof Node\Expr\StaticCall) {
+                if ($stmt instanceof Expression && $stmt->expr instanceof StaticCall) {
                     $class = $stmt->expr->class;
-                    if ($class instanceof Node\Name && 'parent' === $class->toString()) {
-                        $stmt->expr->class = new Node\Name($this->extends->toCodeString());
+                    if ($class instanceof Name && 'parent' === $class->toString()) {
+                        $stmt->expr->class = new Name($this->extends->toCodeString());
                     }
                 }
             }
@@ -158,7 +163,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
         $class = $this->class->toString();
         $staticCall = new StaticCall(new Name('self'), '_proxyCall', [
             // __CLASS__
-            new Node\Arg(new ClassConstFetch(new Name($class), new Identifier('class'))),
+            new Arg(new ClassConstFetch(new Name($class), new Identifier('class'))),
             // __FUNCTION__
             new Arg(new MagicConstFunction()),
             // ['order' => ['param1', 'param2'], 'keys' => compact('param1', 'param2'), 'variadic' => 'param2']
@@ -180,6 +185,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
             $stmts[] = new Expression($staticCall);
         }
         $node->stmts = $stmts;
+
         return $node;
     }
 
@@ -192,6 +198,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
         return array_map(function (Node\Param $param) {
             $tempParam = clone $param;
             $tempParam->flags &= ~Modifiers::VISIBILITY_MASK & ~Modifiers::READONLY;
+
             return $tempParam;
         }, $params);
     }
@@ -214,6 +221,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
             array_map(fn (Node\Param $param) => new ArrayItem(new String_($param->var->name)), $params),
             ['kind' => Array_::KIND_SHORT]
         );
+
         return new Array_([
             new ArrayItem(
                 value: $methodParamsList,
@@ -239,6 +247,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
                 return new String_($param->var->name);
             }
         }
+
         return new String_('');
     }
 
@@ -247,6 +256,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
         $magicConstFunction = new Expression(new Assign(new Variable('__function__'), new MagicConstFunction()));
         $magicConstMethod = new Expression(new Assign(new Variable('__method__'), new MagicConstMethod()));
         array_unshift($stmts, $magicConstFunction, $magicConstMethod);
+
         return $stmts;
     }
 
@@ -256,6 +266,7 @@ class ProxyNodeVisitor extends NodeVisitorAbstract
     private function buildProxyCallTraitUseStatement(): ?TraitUse
     {
         $traits = [new Name('\\' . ProxyCallTrait::class)];
+
         return new TraitUse($traits);
     }
 

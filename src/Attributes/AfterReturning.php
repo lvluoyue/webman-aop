@@ -6,7 +6,7 @@ namespace Luoyue\aop\Attributes;
 class AfterReturning
 {
     /**
-     * 返回通知（After Returning）
+     * 返回通知（After Returning）.
      * @param array|string $pointcut 切入点表达式
      */
     public function __construct(array|string $pointcut)

@@ -2,9 +2,9 @@
 
 namespace Luoyue\aop\Proxy;
 
+use Closure;
 use Luoyue\aop\exception\ProceedingJoinPointException;
 use Luoyue\aop\interfaces\ProceedingJoinPointInterface;
-use Closure;
 use ReflectionFunction;
 use ReflectionMethod;
 use support\Container;
@@ -14,14 +14,13 @@ use support\Container;
  */
 class ProceedingJoinPoint implements ProceedingJoinPointInterface
 {
-
     public ?Closure $pipe;
 
     /** @var ReflectionMethod[] */
     private static array $reflectMethods;
 
     /**
-     * 构造一个新的方法拦截器实例
+     * 构造一个新的方法拦截器实例.
      *
      * @param string $className 类名，表示需要拦截的类
      * @param string $methodName 方法名，表示需要拦截的方法
@@ -29,9 +28,9 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
      * @param Closure $originalMethod 原始方法的闭包，允许在拦截后仍然可以调用原始方法
      */
     public function __construct(public string $className,
-                                public string $methodName,
-                                public array $arguments,
-                                public Closure $originalMethod)
+        public string $methodName,
+        public array $arguments,
+        public Closure $originalMethod)
     {
     }
 
@@ -41,6 +40,7 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
         if (!$this->pipe) {
             throw new ProceedingJoinPointException('The pipe is empty');
         }
+
         return $c($this);
     }
 
@@ -49,6 +49,7 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
         $this->pipe = null;
         $closure = $this->originalMethod;
         $arguments = $this->getArguments();
+
         return $closure(...$arguments);
     }
 
@@ -74,6 +75,7 @@ class ProceedingJoinPoint implements ProceedingJoinPointInterface
             $variadic = array_pop($result);
             $result = array_merge($result, [$order => $variadic]);
         }
+
         return $result;
     }
 
