@@ -120,7 +120,7 @@ class Aspect
      */
     private function scanPointcut(string $dir): void
     {
-        $dirIterator = new \RecursiveDirectoryIterator(app_path($dir));
+        $dirIterator = new \RecursiveDirectoryIterator(base_path($dir));
         $iterator = new \RecursiveIteratorIterator($dirIterator);
         /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
