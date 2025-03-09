@@ -120,6 +120,9 @@ class Aspect
      */
     private function scanPointcut(string $dir): void
     {
+        if (is_phar()) {
+            $dir = realpath($dir);
+        }
         $dirIterator = new \RecursiveDirectoryIterator($dir);
         $iterator = new \RecursiveIteratorIterator($dirIterator);
         /** @var SplFileInfo $file */
