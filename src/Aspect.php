@@ -120,8 +120,8 @@ class Aspect
      */
     private function scanPointcut(string $dir): void
     {
-        if (is_phar()) {
-            $dir = realpath($dir);
+        if (is_phar() && str_contains($dir, 'phar://')) {
+            $dir = new \Phar($dir);
         }
         $dirIterator = new \RecursiveDirectoryIterator($dir);
         $iterator = new \RecursiveIteratorIterator($dirIterator);
