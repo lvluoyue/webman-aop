@@ -14,7 +14,7 @@ class AopBootstrap implements Bootstrap
     {
         $workerName = $worker?->name ?? 'master';
         $config = config('plugin.luoyue.aop.app');
-        if ($workerName === 'monitor' || !$config['enable']) {
+        if (in_array($workerName, $config['ignore_process']) || !$config['enable']) {
             return;
         }
 
